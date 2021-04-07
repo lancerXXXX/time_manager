@@ -9,6 +9,8 @@ public class PlanitemorderEntity {
     private int planItemId;
     private Integer prePlanItemId;
     private Integer nextPlanItemId;
+    private PlanitemEntity planitemByPrePlanItemId;
+    private PlanitemEntity planitemByNextPlanItemId;
 
     @Id
     @Column(name = "id")
@@ -74,5 +76,25 @@ public class PlanitemorderEntity {
         result = 31 * result + (prePlanItemId != null ? prePlanItemId.hashCode() : 0);
         result = 31 * result + (nextPlanItemId != null ? nextPlanItemId.hashCode() : 0);
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "pre_planItem_id", referencedColumnName = "id")
+    public PlanitemEntity getPlanitemByPrePlanItemId() {
+        return planitemByPrePlanItemId;
+    }
+
+    public void setPlanitemByPrePlanItemId(PlanitemEntity planitemByPrePlanItemId) {
+        this.planitemByPrePlanItemId = planitemByPrePlanItemId;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "next_planItem_id", referencedColumnName = "id")
+    public PlanitemEntity getPlanitemByNextPlanItemId() {
+        return planitemByNextPlanItemId;
+    }
+
+    public void setPlanitemByNextPlanItemId(PlanitemEntity planitemByNextPlanItemId) {
+        this.planitemByNextPlanItemId = planitemByNextPlanItemId;
     }
 }

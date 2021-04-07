@@ -10,6 +10,9 @@ public class PlanitemtimerangeEntity {
     private int dateId;
     private Integer timeId;
     private byte type;
+    private PlanitemEntity planitemByPlanItemId;
+    private DateEntity dateByTimeId;
+    private TimeEntity timeByTimeId;
 
     @Id
     @Column(name = "id")
@@ -85,5 +88,35 @@ public class PlanitemtimerangeEntity {
         result = 31 * result + (timeId != null ? timeId.hashCode() : 0);
         result = 31 * result + (int) type;
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "planItem_id", referencedColumnName = "id", nullable = false)
+    public PlanitemEntity getPlanitemByPlanItemId() {
+        return planitemByPlanItemId;
+    }
+
+    public void setPlanitemByPlanItemId(PlanitemEntity planitemByPlanItemId) {
+        this.planitemByPlanItemId = planitemByPlanItemId;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "time_id", referencedColumnName = "id")
+    public DateEntity getDateByTimeId() {
+        return dateByTimeId;
+    }
+
+    public void setDateByTimeId(DateEntity dateByTimeId) {
+        this.dateByTimeId = dateByTimeId;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "time_id", referencedColumnName = "id")
+    public TimeEntity getTimeByTimeId() {
+        return timeByTimeId;
+    }
+
+    public void setTimeByTimeId(TimeEntity timeByTimeId) {
+        this.timeByTimeId = timeByTimeId;
     }
 }

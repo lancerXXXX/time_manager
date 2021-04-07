@@ -9,6 +9,8 @@ public class FiltertemplateplanitemtypeEntity {
     private int root;
     private byte not;
     private int taskType;
+    private FiltertemplateEntity filtertemplateByRoot;
+    private PlanitemtypeEntity planitemtypeByTaskType;
 
     @Id
     @Column(name = "id")
@@ -72,5 +74,25 @@ public class FiltertemplateplanitemtypeEntity {
         result = 31 * result + (int) not;
         result = 31 * result + taskType;
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "root", referencedColumnName = "id", nullable = false)
+    public FiltertemplateEntity getFiltertemplateByRoot() {
+        return filtertemplateByRoot;
+    }
+
+    public void setFiltertemplateByRoot(FiltertemplateEntity filtertemplateByRoot) {
+        this.filtertemplateByRoot = filtertemplateByRoot;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "task_type", referencedColumnName = "id", nullable = false)
+    public PlanitemtypeEntity getPlanitemtypeByTaskType() {
+        return planitemtypeByTaskType;
+    }
+
+    public void setPlanitemtypeByTaskType(PlanitemtypeEntity planitemtypeByTaskType) {
+        this.planitemtypeByTaskType = planitemtypeByTaskType;
     }
 }

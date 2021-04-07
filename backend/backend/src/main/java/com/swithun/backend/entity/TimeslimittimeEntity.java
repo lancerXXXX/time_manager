@@ -9,6 +9,9 @@ public class TimeslimittimeEntity {
     private int root;
     private int type;
     private int time;
+    private TimeslimitEntity timeslimitByRoot;
+    private DateEntity dateByTime;
+    private TimeEntity timeByTime;
 
     @Id
     @Column(name = "id")
@@ -72,5 +75,35 @@ public class TimeslimittimeEntity {
         result = 31 * result + type;
         result = 31 * result + time;
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "root", referencedColumnName = "id", nullable = false)
+    public TimeslimitEntity getTimeslimitByRoot() {
+        return timeslimitByRoot;
+    }
+
+    public void setTimeslimitByRoot(TimeslimitEntity timeslimitByRoot) {
+        this.timeslimitByRoot = timeslimitByRoot;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "time", referencedColumnName = "id", nullable = false)
+    public DateEntity getDateByTime() {
+        return dateByTime;
+    }
+
+    public void setDateByTime(DateEntity dateByTime) {
+        this.dateByTime = dateByTime;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "time", referencedColumnName = "id", nullable = false)
+    public TimeEntity getTimeByTime() {
+        return timeByTime;
+    }
+
+    public void setTimeByTime(TimeEntity timeByTime) {
+        this.timeByTime = timeByTime;
     }
 }

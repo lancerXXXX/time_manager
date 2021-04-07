@@ -9,6 +9,9 @@ public class FiltertemplatetimeEntity {
     private int filtertTemplateId;
     private byte type;
     private int time;
+    private FiltertemplateEntity filtertemplateByFiltertTemplateId;
+    private DateEntity dateByTime;
+    private TimeEntity timeByTime;
 
     @Id
     @Column(name = "id")
@@ -72,5 +75,35 @@ public class FiltertemplatetimeEntity {
         result = 31 * result + (int) type;
         result = 31 * result + time;
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "filtertTemplateId", referencedColumnName = "id", nullable = false)
+    public FiltertemplateEntity getFiltertemplateByFiltertTemplateId() {
+        return filtertemplateByFiltertTemplateId;
+    }
+
+    public void setFiltertemplateByFiltertTemplateId(FiltertemplateEntity filtertemplateByFiltertTemplateId) {
+        this.filtertemplateByFiltertTemplateId = filtertemplateByFiltertTemplateId;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "time", referencedColumnName = "id", nullable = false)
+    public DateEntity getDateByTime() {
+        return dateByTime;
+    }
+
+    public void setDateByTime(DateEntity dateByTime) {
+        this.dateByTime = dateByTime;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "time", referencedColumnName = "id", nullable = false)
+    public TimeEntity getTimeByTime() {
+        return timeByTime;
+    }
+
+    public void setTimeByTime(TimeEntity timeByTime) {
+        this.timeByTime = timeByTime;
     }
 }

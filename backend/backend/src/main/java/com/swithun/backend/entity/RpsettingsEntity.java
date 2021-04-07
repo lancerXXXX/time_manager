@@ -9,6 +9,7 @@ public class RpsettingsEntity {
     private int taskType;
     private String taskName;
     private String point;
+    private PlanitemtypeEntity planitemtypeByTaskType;
 
     @Id
     @Column(name = "id")
@@ -72,5 +73,15 @@ public class RpsettingsEntity {
         result = 31 * result + (taskName != null ? taskName.hashCode() : 0);
         result = 31 * result + (point != null ? point.hashCode() : 0);
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "task_type", referencedColumnName = "id", nullable = false)
+    public PlanitemtypeEntity getPlanitemtypeByTaskType() {
+        return planitemtypeByTaskType;
+    }
+
+    public void setPlanitemtypeByTaskType(PlanitemtypeEntity planitemtypeByTaskType) {
+        this.planitemtypeByTaskType = planitemtypeByTaskType;
     }
 }

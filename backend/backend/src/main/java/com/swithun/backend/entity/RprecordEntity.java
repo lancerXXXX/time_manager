@@ -11,6 +11,7 @@ public class RprecordEntity {
     private int task;
     private Integer point;
     private Integer cost;
+    private PlanitemEntity planitemByTask;
 
     @Id
     @Column(name = "id")
@@ -86,5 +87,15 @@ public class RprecordEntity {
         result = 31 * result + (point != null ? point.hashCode() : 0);
         result = 31 * result + (cost != null ? cost.hashCode() : 0);
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "task", referencedColumnName = "id", nullable = false)
+    public PlanitemEntity getPlanitemByTask() {
+        return planitemByTask;
+    }
+
+    public void setPlanitemByTask(PlanitemEntity planitemByTask) {
+        this.planitemByTask = planitemByTask;
     }
 }

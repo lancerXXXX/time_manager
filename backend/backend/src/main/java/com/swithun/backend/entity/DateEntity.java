@@ -2,6 +2,7 @@ package com.swithun.backend.entity;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.Collection;
 
 @Entity
 @Table(name = "date", schema = "time_management", catalog = "")
@@ -11,6 +12,9 @@ public class DateEntity {
     private String repeatType;
     private Date date;
     private Date date2;
+    private Collection<FiltertemplatetimeEntity> filtertemplatetimesById;
+    private Collection<PlanitemtimerangeEntity> planitemtimerangesById;
+    private Collection<TimeslimittimeEntity> timeslimittimesById;
 
     @Id
     @Column(name = "id")
@@ -86,5 +90,32 @@ public class DateEntity {
         result = 31 * result + (date != null ? date.hashCode() : 0);
         result = 31 * result + (date2 != null ? date2.hashCode() : 0);
         return result;
+    }
+
+    @OneToMany(mappedBy = "dateByTime")
+    public Collection<FiltertemplatetimeEntity> getFiltertemplatetimesById() {
+        return filtertemplatetimesById;
+    }
+
+    public void setFiltertemplatetimesById(Collection<FiltertemplatetimeEntity> filtertemplatetimesById) {
+        this.filtertemplatetimesById = filtertemplatetimesById;
+    }
+
+    @OneToMany(mappedBy = "dateByTimeId")
+    public Collection<PlanitemtimerangeEntity> getPlanitemtimerangesById() {
+        return planitemtimerangesById;
+    }
+
+    public void setPlanitemtimerangesById(Collection<PlanitemtimerangeEntity> planitemtimerangesById) {
+        this.planitemtimerangesById = planitemtimerangesById;
+    }
+
+    @OneToMany(mappedBy = "dateByTime")
+    public Collection<TimeslimittimeEntity> getTimeslimittimesById() {
+        return timeslimittimesById;
+    }
+
+    public void setTimeslimittimesById(Collection<TimeslimittimeEntity> timeslimittimesById) {
+        this.timeslimittimesById = timeslimittimesById;
     }
 }

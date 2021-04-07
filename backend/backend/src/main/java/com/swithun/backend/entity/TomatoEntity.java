@@ -2,6 +2,7 @@ package com.swithun.backend.entity;
 
 import javax.persistence.*;
 import java.sql.Time;
+import java.util.Collection;
 
 @Entity
 @Table(name = "tomato", schema = "time_management", catalog = "")
@@ -10,6 +11,8 @@ public class TomatoEntity {
     private Time workTime;
     private Time relaxTime;
     private String round;
+    private Collection<TemplatechildplanitemEntity> templatechildplanitemsById;
+    private Collection<TrackEntity> tracksById;
 
     @Id
     @Column(name = "id")
@@ -73,5 +76,23 @@ public class TomatoEntity {
         result = 31 * result + (relaxTime != null ? relaxTime.hashCode() : 0);
         result = 31 * result + (round != null ? round.hashCode() : 0);
         return result;
+    }
+
+    @OneToMany(mappedBy = "tomatoByTomato")
+    public Collection<TemplatechildplanitemEntity> getTemplatechildplanitemsById() {
+        return templatechildplanitemsById;
+    }
+
+    public void setTemplatechildplanitemsById(Collection<TemplatechildplanitemEntity> templatechildplanitemsById) {
+        this.templatechildplanitemsById = templatechildplanitemsById;
+    }
+
+    @OneToMany(mappedBy = "tomatoByTomato")
+    public Collection<TrackEntity> getTracksById() {
+        return tracksById;
+    }
+
+    public void setTracksById(Collection<TrackEntity> tracksById) {
+        this.tracksById = tracksById;
     }
 }

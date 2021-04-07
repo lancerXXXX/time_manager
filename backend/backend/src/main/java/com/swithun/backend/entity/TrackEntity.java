@@ -10,6 +10,7 @@ public class TrackEntity {
     private Integer subTask;
     private Time time;
     private Integer tomato;
+    private TomatoEntity tomatoByTomato;
 
     @Id
     @Column(name = "id")
@@ -73,5 +74,15 @@ public class TrackEntity {
         result = 31 * result + (time != null ? time.hashCode() : 0);
         result = 31 * result + (tomato != null ? tomato.hashCode() : 0);
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "tomato", referencedColumnName = "id")
+    public TomatoEntity getTomatoByTomato() {
+        return tomatoByTomato;
+    }
+
+    public void setTomatoByTomato(TomatoEntity tomatoByTomato) {
+        this.tomatoByTomato = tomatoByTomato;
     }
 }

@@ -10,6 +10,7 @@ public class FiltertemplaterateEntity {
     private String type;
     private String operator;
     private String rate;
+    private FiltertemplateEntity filtertemplateByRoot;
 
     @Id
     @Column(name = "id")
@@ -85,5 +86,15 @@ public class FiltertemplaterateEntity {
         result = 31 * result + (operator != null ? operator.hashCode() : 0);
         result = 31 * result + (rate != null ? rate.hashCode() : 0);
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "root", referencedColumnName = "id", nullable = false)
+    public FiltertemplateEntity getFiltertemplateByRoot() {
+        return filtertemplateByRoot;
+    }
+
+    public void setFiltertemplateByRoot(FiltertemplateEntity filtertemplateByRoot) {
+        this.filtertemplateByRoot = filtertemplateByRoot;
     }
 }

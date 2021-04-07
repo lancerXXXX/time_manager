@@ -9,6 +9,8 @@ public class TemplatechildplanitemEntity {
     private int root;
     private String name;
     private Integer tomato;
+    private TemplateEntity templateByRoot;
+    private TomatoEntity tomatoByTomato;
 
     @Id
     @Column(name = "id")
@@ -72,5 +74,25 @@ public class TemplatechildplanitemEntity {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (tomato != null ? tomato.hashCode() : 0);
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "root", referencedColumnName = "id", nullable = false)
+    public TemplateEntity getTemplateByRoot() {
+        return templateByRoot;
+    }
+
+    public void setTemplateByRoot(TemplateEntity templateByRoot) {
+        this.templateByRoot = templateByRoot;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "tomato", referencedColumnName = "id")
+    public TomatoEntity getTomatoByTomato() {
+        return tomatoByTomato;
+    }
+
+    public void setTomatoByTomato(TomatoEntity tomatoByTomato) {
+        this.tomatoByTomato = tomatoByTomato;
     }
 }

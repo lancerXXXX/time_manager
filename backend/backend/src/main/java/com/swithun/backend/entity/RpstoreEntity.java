@@ -8,6 +8,7 @@ public class RpstoreEntity {
     private int id;
     private int task;
     private int cost;
+    private TimeslimitEntity timeslimitByTask;
 
     @Id
     @Column(name = "id")
@@ -59,5 +60,15 @@ public class RpstoreEntity {
         result = 31 * result + task;
         result = 31 * result + cost;
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "task", referencedColumnName = "id", nullable = false)
+    public TimeslimitEntity getTimeslimitByTask() {
+        return timeslimitByTask;
+    }
+
+    public void setTimeslimitByTask(TimeslimitEntity timeslimitByTask) {
+        this.timeslimitByTask = timeslimitByTask;
     }
 }

@@ -1,6 +1,7 @@
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
 @Table(name = "timeslimit", schema = "time_management", catalog = "")
@@ -10,6 +11,9 @@ public class TimeslimitEntity {
     private String taskName;
     private String operator;
     private String frequency;
+    private Collection<RpstoreEntity> rpstoresById;
+    private PlanitemtypeEntity planitemtypeByTaskType;
+    private Collection<TimeslimittimeEntity> timeslimittimesById;
 
     @Id
     @Column(name = "id")
@@ -85,5 +89,33 @@ public class TimeslimitEntity {
         result = 31 * result + (operator != null ? operator.hashCode() : 0);
         result = 31 * result + (frequency != null ? frequency.hashCode() : 0);
         return result;
+    }
+
+    @OneToMany(mappedBy = "timeslimitByTask")
+    public Collection<RpstoreEntity> getRpstoresById() {
+        return rpstoresById;
+    }
+
+    public void setRpstoresById(Collection<RpstoreEntity> rpstoresById) {
+        this.rpstoresById = rpstoresById;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "task_type", referencedColumnName = "id", nullable = false)
+    public PlanitemtypeEntity getPlanitemtypeByTaskType() {
+        return planitemtypeByTaskType;
+    }
+
+    public void setPlanitemtypeByTaskType(PlanitemtypeEntity planitemtypeByTaskType) {
+        this.planitemtypeByTaskType = planitemtypeByTaskType;
+    }
+
+    @OneToMany(mappedBy = "timeslimitByRoot")
+    public Collection<TimeslimittimeEntity> getTimeslimittimesById() {
+        return timeslimittimesById;
+    }
+
+    public void setTimeslimittimesById(Collection<TimeslimittimeEntity> timeslimittimesById) {
+        this.timeslimittimesById = timeslimittimesById;
     }
 }

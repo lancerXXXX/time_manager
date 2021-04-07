@@ -1,6 +1,7 @@
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
 @Table(name = "template", schema = "time_management", catalog = "")
@@ -11,6 +12,8 @@ public class TemplateEntity {
     private String name;
     private int taskType;
     private byte hasSubTasks;
+    private PlanitemtypeEntity planitemtypeByTaskType;
+    private Collection<TemplatechildplanitemEntity> templatechildplanitemsById;
 
     @Id
     @Column(name = "id")
@@ -98,5 +101,24 @@ public class TemplateEntity {
         result = 31 * result + taskType;
         result = 31 * result + (int) hasSubTasks;
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "task_type", referencedColumnName = "id", nullable = false)
+    public PlanitemtypeEntity getPlanitemtypeByTaskType() {
+        return planitemtypeByTaskType;
+    }
+
+    public void setPlanitemtypeByTaskType(PlanitemtypeEntity planitemtypeByTaskType) {
+        this.planitemtypeByTaskType = planitemtypeByTaskType;
+    }
+
+    @OneToMany(mappedBy = "templateByRoot")
+    public Collection<TemplatechildplanitemEntity> getTemplatechildplanitemsById() {
+        return templatechildplanitemsById;
+    }
+
+    public void setTemplatechildplanitemsById(Collection<TemplatechildplanitemEntity> templatechildplanitemsById) {
+        this.templatechildplanitemsById = templatechildplanitemsById;
     }
 }

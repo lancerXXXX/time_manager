@@ -3,6 +3,7 @@ package com.swithun.backend.entity;
 import javax.persistence.*;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Collection;
 
 @Entity
 @Table(name = "planitem", schema = "time_management", catalog = "")
@@ -20,6 +21,11 @@ public class PlanitemEntity {
     private String satisfaction;
     private String type;
     private Integer parent;
+    private PlanitemtypeEntity planitemtypeByTaskType;
+    private Collection<PlanitemorderEntity> planitemordersById;
+    private Collection<PlanitemorderEntity> planitemordersById_0;
+    private Collection<PlanitemtimerangeEntity> planitemtimerangesById;
+    private Collection<RprecordEntity> rprecordsById;
 
     @Id
     @Column(name = "id")
@@ -191,5 +197,51 @@ public class PlanitemEntity {
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (parent != null ? parent.hashCode() : 0);
         return result;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "task_type", referencedColumnName = "id", nullable = false)
+    public PlanitemtypeEntity getPlanitemtypeByTaskType() {
+        return planitemtypeByTaskType;
+    }
+
+    public void setPlanitemtypeByTaskType(PlanitemtypeEntity planitemtypeByTaskType) {
+        this.planitemtypeByTaskType = planitemtypeByTaskType;
+    }
+
+    @OneToMany(mappedBy = "planitemByPrePlanItemId")
+    public Collection<PlanitemorderEntity> getPlanitemordersById() {
+        return planitemordersById;
+    }
+
+    public void setPlanitemordersById(Collection<PlanitemorderEntity> planitemordersById) {
+        this.planitemordersById = planitemordersById;
+    }
+
+    @OneToMany(mappedBy = "planitemByNextPlanItemId")
+    public Collection<PlanitemorderEntity> getPlanitemordersById_0() {
+        return planitemordersById_0;
+    }
+
+    public void setPlanitemordersById_0(Collection<PlanitemorderEntity> planitemordersById_0) {
+        this.planitemordersById_0 = planitemordersById_0;
+    }
+
+    @OneToMany(mappedBy = "planitemByPlanItemId")
+    public Collection<PlanitemtimerangeEntity> getPlanitemtimerangesById() {
+        return planitemtimerangesById;
+    }
+
+    public void setPlanitemtimerangesById(Collection<PlanitemtimerangeEntity> planitemtimerangesById) {
+        this.planitemtimerangesById = planitemtimerangesById;
+    }
+
+    @OneToMany(mappedBy = "planitemByTask")
+    public Collection<RprecordEntity> getRprecordsById() {
+        return rprecordsById;
+    }
+
+    public void setRprecordsById(Collection<RprecordEntity> rprecordsById) {
+        this.rprecordsById = rprecordsById;
     }
 }
