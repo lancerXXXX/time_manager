@@ -5,11 +5,10 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 15:52:48
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-12 16:28:51
+ * @LastEditTime: 2021-04-12 16:38:02
  */
 package com.swithun.backend.utils;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 import org.springframework.stereotype.Component;
@@ -20,12 +19,12 @@ public class DateUtil {
         return LocalDate.now().toString();
     }
     public String todayOfWeek() {
-        return String.valueOf(DayOfWeek.from(LocalDate.now()).getValue());
+        return String.valueOf(LocalDate.now().getDayOfWeek().getValue());
     }
     public String todayD() {
-        return LocalDate.now().toString().substring(8);
+        return String.valueOf(LocalDate.now().getDayOfMonth());
     }
     public String todayMD() {
-        return LocalDate.now().toString().substring(5);
+        return String.valueOf(LocalDate.now().getDayOfYear());
     }
 }
