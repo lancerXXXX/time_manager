@@ -8,6 +8,7 @@ import java.util.Objects;
 @Table(name = "plan", schema = "time_manger", catalog = "")
 public class PlanEntity {
     private Integer id;
+    private String planName;
     private Integer repeatType; // 重复类型 0(1次) 1(每周) 2(每月) 3(每年)
     private String expectedStartDate; // 预计开始时间
     // 重复类型 0 2020-01-01
@@ -126,5 +127,12 @@ public class PlanEntity {
         return Objects.hash(id,expectedStartDate, expectedEndDate, expectedStartTime, expectedEndTime, practiceStartDateTime, ended);
     }
 
+    public String getPlanName() {
+        return planName;
+    }
+
+    public void setPlanName(String planName) {
+        this.planName = planName;
+    }
 
 }

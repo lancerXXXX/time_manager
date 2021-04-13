@@ -1,3 +1,12 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @@Company: None
+ * @Author: Swithun Liu
+ * @Date: 2021-04-08 14:34:52
+ * @LastEditors: Swithun Liu
+ * @LastEditTime: 2021-04-13 15:16:34
+ */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
@@ -6,7 +15,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "endedTaskRecord", schema = "time_manger", catalog = "")
-public class EndedTaskRecordEntity {
+public class FinishedTaskRecordEntity {
     private Integer id;
     private Integer planId;
     private Timestamp startTime;
@@ -56,7 +65,7 @@ public class EndedTaskRecordEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EndedTaskRecordEntity that = (EndedTaskRecordEntity) o;
+        FinishedTaskRecordEntity that = (FinishedTaskRecordEntity) o;
         return Objects.equals(id, that.id) && Objects.equals(planId, that.planId) && Objects.equals(startTime, that.startTime) && Objects.equals(endTime, that.endTime);
     }
 
