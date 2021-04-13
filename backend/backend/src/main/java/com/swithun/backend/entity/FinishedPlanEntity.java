@@ -4,8 +4,8 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "UnfinishedPlan", schema = "time_manger", catalog = "")
-public class UnfinishedPlanEntity {
+@Table(name = "finishedPlan", schema = "time_manger", catalog = "")
+public class FinishedPlanEntity {
     private Integer id;
     private PlanEntity planByPlanId;
 
@@ -23,7 +23,7 @@ public class UnfinishedPlanEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UnfinishedPlanEntity that = (UnfinishedPlanEntity) o;
+        FinishedPlanEntity that = (FinishedPlanEntity) o;
         return Objects.equals(id, that.id);
     }
 

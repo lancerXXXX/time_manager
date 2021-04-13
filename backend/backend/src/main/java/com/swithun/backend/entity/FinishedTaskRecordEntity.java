@@ -1,12 +1,3 @@
-/*
- * @Descripttion: 
- * @version: 
- * @@Company: None
- * @Author: Swithun Liu
- * @Date: 2021-04-08 14:34:52
- * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-13 15:16:34
- */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
@@ -14,12 +5,12 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
-@Table(name = "endedTaskRecord", schema = "time_manger", catalog = "")
+@Table(name = "FinishedTaskRecord", schema = "time_manger", catalog = "")
 public class FinishedTaskRecordEntity {
     private Integer id;
-    private Integer planId;
     private Timestamp startTime;
     private Timestamp endTime;
+    private PlanEntity planByPlanId;
 
     @Id
     @Column(name = "id")
@@ -29,16 +20,6 @@ public class FinishedTaskRecordEntity {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    @Basic
-    @Column(name = "plan_id")
-    public Integer getPlanId() {
-        return planId;
-    }
-
-    public void setPlanId(Integer planId) {
-        this.planId = planId;
     }
 
     @Basic
@@ -66,11 +47,21 @@ public class FinishedTaskRecordEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FinishedTaskRecordEntity that = (FinishedTaskRecordEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(planId, that.planId) && Objects.equals(startTime, that.startTime) && Objects.equals(endTime, that.endTime);
+        return Objects.equals(id, that.id) && Objects.equals(startTime, that.startTime) && Objects.equals(endTime, that.endTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, planId, startTime, endTime);
+        return Objects.hash(id, startTime, endTime);
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "plan_id", referencedColumnName = "id", nullable = false)
+    public PlanEntity getPlanByPlanId() {
+        return planByPlanId;
+    }
+
+    public void setPlanByPlanId(PlanEntity planByPlanId) {
+        this.planByPlanId = planByPlanId;
     }
 }

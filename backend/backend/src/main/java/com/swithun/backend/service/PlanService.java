@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 16:42:46
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-12 17:11:00
+ * @LastEditTime: 2021-04-13 16:49:59
  */
 package com.swithun.backend.service;
 
@@ -17,6 +17,7 @@ import java.util.Locale;
 
 import com.swithun.backend.dao.PlanRepository;
 import com.swithun.backend.entity.PlanEntity;
+import com.swithun.backend.entity.UnfinishedPlanEntity;
 import com.swithun.backend.utils.DateUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class PlanService {
     PlanRepository planRepository;
     @Autowired
     private DateUtil dateUtil;
+    @Autowired
+    private UnfinishedPlanRepository unfinishedPlanRepository;
 
     /**
      * @description: 获取本周计划
@@ -122,7 +125,10 @@ public class PlanService {
      * @return {*}
      */
     public void addPlan(PlanEntity planEntity) {
-        planRepository.save(planEntity);
+        UnfinishedPlanEntity unfinishedPlanEntity = new UnfinishedPlanEntity();
+        unfinishedPlanEntity.setPlanByPlanId(planEntity);
+        unfinishedPlanRepository.save(unfinishedPlanEntity);
+        // planRepository.save(planEntity);
     }
 
 }

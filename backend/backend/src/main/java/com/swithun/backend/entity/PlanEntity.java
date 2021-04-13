@@ -2,6 +2,7 @@ package com.swithun.backend.entity;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -9,28 +10,36 @@ import java.util.Objects;
 public class PlanEntity {
     private Integer id;
     private String planName;
-    private Integer repeatType; // 重复类型 0(1次) 1(每周) 2(每月) 3(每年)
-    private String expectedStartDate; // 预计开始时间
-    // 重复类型 0 2020-01-01
-    //         1 1~7
-    //         2 1~31
-    //         3 01-01
-    private String expectedEndDate; // 预计结束时间
-    private Timestamp expectedStartTime; // 预计几点开始
-    private Timestamp expectedEndTime; // 预计几点结束
-    private Timestamp practiceStartDateTime; // 实际结束时间(整个可重复任务开始)
-    private Timestamp practiceEndDateTime; // 实际结束时间(整个可重复任务结束)
+    private Integer repeatType;
+    private String expectedStartDate;
+    private String expectedEndDate;
+    private Timestamp expectedStartTime;
+    private Timestamp expectedEndTime;
+    private Timestamp practiceStartDateTime;
+    private Timestamp practiceEndDateTime;
     private Byte ended;
+    private Collection<FinishedTaskRecordEntity> finishedTaskRecordsById;
+    private Collection<UnfinishedPlanEntity> unfinishedPlansById;
+    private Collection<FinishedPlanEntity> finishedPlansById;
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    @Basic
+    @Column(name = "plan_name")
+    public String getPlanName() {
+        return planName;
+    }
+
+    public void setPlanName(String planName) {
+        this.planName = planName;
     }
 
     @Basic
@@ -42,7 +51,6 @@ public class PlanEntity {
     public void setRepeatType(Integer repeatType) {
         this.repeatType = repeatType;
     }
-
 
     @Basic
     @Column(name = "expected_start_date")
@@ -119,20 +127,38 @@ public class PlanEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PlanEntity that = (PlanEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(expectedStartDate, that.expectedStartDate) && Objects.equals(expectedEndDate, that.expectedEndDate) && Objects.equals(expectedStartTime, that.expectedStartTime) && Objects.equals(expectedEndTime, that.expectedEndTime) && Objects.equals(practiceStartDateTime, that.practiceStartDateTime) && Objects.equals(ended, that.ended);
+        return Objects.equals(id, that.id) && Objects.equals(planName, that.planName) && Objects.equals(repeatType, that.repeatType) && Objects.equals(expectedStartDate, that.expectedStartDate) && Objects.equals(expectedEndDate, that.expectedEndDate) && Objects.equals(expectedStartTime, that.expectedStartTime) && Objects.equals(expectedEndTime, that.expectedEndTime) && Objects.equals(practiceStartDateTime, that.practiceStartDateTime) && Objects.equals(practiceEndDateTime, that.practiceEndDateTime) && Objects.equals(ended, that.ended);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id,expectedStartDate, expectedEndDate, expectedStartTime, expectedEndTime, practiceStartDateTime, ended);
+        return Objects.hash(id, planName, repeatType, expectedStartDate, expectedEndDate, expectedStartTime, expectedEndTime, practiceStartDateTime, practiceEndDateTime, ended);
     }
 
-    public String getPlanName() {
-        return planName;
+    @OneToMany(mappedBy = "planByPlanId")
+    public Collection<FinishedTaskRecordEntity> getFinishedTaskRecordsById() {
+        return finishedTaskRecordsById;
     }
 
-    public void setPlanName(String planName) {
-        this.planName = planName;
+    public void setFinishedTaskRecordsById(Collection<FinishedTaskRecordEntity> finishedTaskRecordsById) {
+        this.finishedTaskRecordsById = finishedTaskRecordsById;
     }
 
+    @OneToMany(mappedBy = "planByPlanId")
+    public Collection<UnfinishedPlanEntity> getUnfinishedPlansById() {
+        return unfinishedPlansById;
+    }
+
+    public void setUnfinishedPlansById(Collection<UnfinishedPlanEntity> unfinishedPlansById) {
+        this.unfinishedPlansById = unfinishedPlansById;
+    }
+
+    @OneToMany(mappedBy = "planByPlanId")
+    public Collection<FinishedPlanEntity> getFinishedPlansById() {
+        return finishedPlansById;
+    }
+
+    public void setFinishedPlansById(Collection<FinishedPlanEntity> finishedPlansById) {
+        this.finishedPlansById = finishedPlansById;
+    }
 }
