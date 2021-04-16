@@ -5,15 +5,19 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 16:42:46
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-13 16:49:59
+ * @LastEditTime: 2021-04-16 10:29:02
  */
 package com.swithun.backend.service;
 
 import java.time.LocalDate;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
 import java.util.List;
-import java.util.Locale;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import com.swithun.backend.dao.PlanRepository;
 import com.swithun.backend.entity.PlanEntity;
@@ -21,114 +25,173 @@ import com.swithun.backend.entity.UnfinishedPlanEntity;
 import com.swithun.backend.utils.DateUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PlanService {
-    @Autowired
-    PlanRepository planRepository;
-    @Autowired
-    private DateUtil dateUtil;
-    @Autowired
-    private UnfinishedPlanRepository unfinishedPlanRepository;
+        @Autowired
+        PlanRepository planRepository;
+        @Autowired
+        private UnfinishedPlanRepository unfinishedPlanRepository;
 
-    /**
-     * @description: 获取本周计划
-     * @param {String date} date = "" 则默认取当日
-     * @return {List<PlanEntity>}
-     */
-    public List<PlanEntity> getWeekPlan(String date) {
-        LocalDate now;
-        if (date == "") {
-            now = LocalDate.now();
-        } else {
-            now = LocalDate.parse(date);
+        /**
+         * @description: 获取本周计划
+         * @param {String date} date = "" 则默认取当日
+         * @return {List<UnfinishedPlanEntity>}
+         */
+        public List<UnfinishedPlanEntity> getWeekPlan(String date) {
+                LocalDate now = date == "" ? LocalDate.now() : LocalDate.parse(date);
+
+                String strs[] = DateUtil.parsePreNext(now);
+
+                List<UnfinishedPlanEntity> unfinishedPlanEntities = unfinishedPlanRepository
+                                .findAll(new Specification<UnfinishedPlanEntity>() {
+                                        /**
+                                         *
+                                         */
+                                        private static final long serialVersionUID = 1L;
+
+                                        @Override
+                                        public Predicate toPredicate(Root<UnfinishedPlanEntity> root,
+                                                        CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                                                Join<Object, Object> join = root.join("planByPlanId");
+                                                Path<Object> repeatTypePath = join.get("repeatType");
+                                                Path<Object> expectedStartDatePath = join.get("expectedStartDate");
+                                                Path<Object> expectedEndDatePath = join.get("expectedEndDate");
+                                                // 非重复计划
+                                                Predicate predicate0 = criteriaBuilder.equal(repeatTypePath, 0);
+                                                Predicate predicate0Date = criteriaBuilder.or(
+                                                                criteriaBuilder.between(
+                                                                                expectedStartDatePath.as(String.class),
+                                                                                strs[0], strs[1]),
+                                                                criteriaBuilder.between(
+                                                                                expectedEndDatePath.as(String.class),
+                                                                                strs[0], strs[1]));
+                                                Predicate type0 = criteriaBuilder.and(predicate0, predicate0Date);
+
+                                                // 周重复计划
+                                                Predicate type1 = criteriaBuilder.equal(repeatTypePath, 1);
+
+                                                // 月重复计划
+                                                Predicate predicate2 = criteriaBuilder.equal(repeatTypePath, 2);
+                                                Predicate predicate2Date = criteriaBuilder.or(
+                                                                criteriaBuilder.between(
+                                                                                expectedStartDatePath.as(String.class),
+                                                                                strs[4], strs[5]),
+                                                                criteriaBuilder.between(
+                                                                                expectedEndDatePath.as(String.class),
+                                                                                strs[4], strs[5]));
+                                                Predicate type2 = criteriaBuilder.and(predicate2, predicate2Date);
+
+                                                Predicate predicate3 = criteriaBuilder.equal(repeatTypePath, 3);
+                                                Predicate predicate3Date = criteriaBuilder.or(
+                                                                criteriaBuilder.between(
+                                                                                expectedStartDatePath.as(String.class),
+                                                                                strs[2], strs[3]),
+                                                                criteriaBuilder.between(
+                                                                                expectedEndDatePath.as(String.class),
+                                                                                strs[2], strs[3]));
+                                                Predicate type3 = criteriaBuilder.and(predicate3, predicate3Date);
+
+                                                return criteriaBuilder.or(type0, type1, type2, type3);
+                                        }
+                                });
+                return unfinishedPlanEntities;
         }
-        TemporalField fieldISO = WeekFields.of(Locale.FRANCE).dayOfWeek();
-        // For 非重复计划
-        String last_sunday = now.with(fieldISO, 1).plusDays(-1).toString();
-        String next_monday = now.with(fieldISO, 7).plusDays(1).toString();
-        // For 月重复计划
-        String start_day_pre = last_sunday.substring(8);
-        String end_day_next = next_monday.substring(8);
-        // For 年重复计划
-        String start_month_day_pre = last_sunday.substring(5);
-        String end_month_day_next = next_monday.substring(5);
 
-        // 查找非重复计划
-        List<PlanEntity> ans = planRepository
-                .findByRepeatTypeAndExpectedStartDateBetweenOrRepeatTypeAndExpectedEndDateBetween(0, last_sunday,
-                        next_monday, 0, last_sunday, next_monday);
-        // 查找周重复计划
-        ans.addAll(planRepository.findByRepeatType(1));
-        // 查找月重复计划
-        ans.addAll(planRepository.findByRepeatTypeAndExpectedStartDateBetweenOrRepeatTypeAndExpectedEndDateBetween(2,
-                start_day_pre, end_day_next, 2, start_day_pre, end_day_next));
-        // 查找年重复计划
-        ans.addAll(planRepository.findByRepeatTypeAndExpectedStartDateBetweenOrRepeatTypeAndExpectedEndDateBetween(3,
-                start_month_day_pre, end_month_day_next, 3, start_month_day_pre, end_month_day_next));
-        return ans;
-    }
+        /**
+         * @description: 获取当天的task
+         * @param {*}
+         * @return {List<PlanEntity>}
+         */
 
-    /**
-     * @description: 获取当天的task
-     * @param {*}
-     * @return {List<PlanEntity>}
-     */
-    public List<PlanEntity> gettaskbydate(String date) {
-        LocalDate localDate;
-        if (date == "") {
-            localDate = LocalDate.now();
-        } else {
-            localDate = LocalDate.parse(date);
+        public List<UnfinishedPlanEntity> gettaskbydate(String date) {
+                LocalDate localDate = date == "" ? LocalDate.now() : LocalDate.parse(date);
+                String[] strs = DateUtil.parse(localDate);
+
+                List<UnfinishedPlanEntity> unfinishedPlanEntities = unfinishedPlanRepository
+                                .findAll(new Specification<UnfinishedPlanEntity>() {
+
+                                        @Override
+                                        public Predicate toPredicate(Root<UnfinishedPlanEntity> root,
+                                                        CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                                                Join<Object, Object> join = root.join("planByPlanId");
+                                                Path<Object> repeat_type = join.get("repeatType");
+                                                Path<Object> expected_start_date_path = join.get("expectedStartDate");
+                                                Path<Object> expected_end_date_path = join.get("expectedEndDate");
+
+                                                Predicate p0 = criteriaBuilder.and(
+                                                                criteriaBuilder.equal(repeat_type, 0),
+                                                                criteriaBuilder.lessThanOrEqualTo(
+                                                                                expected_start_date_path.as(
+                                                                                                String.class),
+                                                                                strs[0]),
+                                                                criteriaBuilder.greaterThanOrEqualTo(
+                                                                                expected_end_date_path.as(String.class),
+                                                                                strs[0]));
+
+                                                Predicate p1 = criteriaBuilder.and(
+                                                                criteriaBuilder.equal(repeat_type, 1),
+                                                                criteriaBuilder.lessThanOrEqualTo(
+                                                                                expected_start_date_path.as(
+                                                                                                String.class),
+                                                                                strs[3]),
+                                                                criteriaBuilder.greaterThanOrEqualTo(
+                                                                                expected_end_date_path.as(String.class),
+                                                                                strs[3]));
+
+                                                Predicate p2 = criteriaBuilder.and(
+                                                                criteriaBuilder.equal(repeat_type, 2),
+                                                                criteriaBuilder.lessThanOrEqualTo(
+                                                                                expected_start_date_path.as(
+                                                                                                String.class),
+                                                                                strs[2]),
+                                                                criteriaBuilder.greaterThanOrEqualTo(
+                                                                                expected_end_date_path.as(String.class),
+                                                                                strs[2]));
+
+                                                Predicate p3 = criteriaBuilder.and(
+                                                                criteriaBuilder.equal(repeat_type, 3),
+                                                                criteriaBuilder.lessThanOrEqualTo(
+                                                                                expected_start_date_path.as(
+                                                                                                String.class),
+                                                                                strs[1]),
+                                                                criteriaBuilder.greaterThanOrEqualTo(
+                                                                                expected_end_date_path.as(String.class),
+                                                                                strs[1]));
+                                                return criteriaBuilder.or(p0, p1, p2, p3);
+                                        }
+
+                                });
+                return unfinishedPlanEntities;
+
         }
 
-        // For 非重复计划 2020-01-01
-        String ymd = dateUtil.todayYMD();
-        System.out.println("today: " + ymd);
-        // For 周重复计划 -- Monday 1
-        String dayOfWeek = dateUtil.todayOfWeek();
-        System.out.println("today is: " + dayOfWeek);
-        // For 月重复计划 -- 01
-        String d = dateUtil.todayD();
-        // For 年重复计划 -- 01-01
-        String md = dateUtil.todayMD();
+        /**
+         * @description: 获取所有未完成计划
+         * @param {*}
+         * @return {List<PlanEntity>}
+         */
+        public List<UnfinishedPlanEntity> getAllPlan() {
+                return unfinishedPlanRepository.findAll();
+        }
 
-        List<PlanEntity> ans;
-        // 获取 非重复计划 -- 开始日期 <= 今日日期 < 结束日期
-        ans = planRepository.findByRepeatTypeAndExpectedStartDateLessThanEqualAndExpectedEndDateGreaterThanEqual(0,
-                localDate.toString(), localDate.toString());
-        // 获取 周重复计划 -- 周几开始 <= 今天周几 <= 周几结束
-        ans.addAll(planRepository.findByRepeatTypeAndExpectedStartDateLessThanEqualAndExpectedEndDateGreaterThanEqual(1,
-                dayOfWeek, dayOfWeek));
-        // 获取 月重复计划 -- 几号开始 <= 今天几号 <= 几号结束
-        ans.addAll(planRepository.findByRepeatTypeAndExpectedStartDateLessThanEqualAndExpectedEndDateGreaterThanEqual(2,
-                d, d));
-        // 获取 年重复计划 -- 几号开始 <= 今天几号 <= 几号结束
-        ans.addAll(planRepository.findByRepeatTypeAndExpectedStartDateLessThanEqualAndExpectedEndDateGreaterThanEqual(3,
-                md, md));
-        return ans;
-    }
+        /**
+         * @description: 添加一个任务(日期为当前)
+         * @param {*}
+         * @return {*}
+         */
+        public void addPlan(PlanEntity planEntity) {
+                UnfinishedPlanEntity unfinishedPlanEntity = new UnfinishedPlanEntity();
+                unfinishedPlanEntity.setPlanByPlanId(planEntity);
+                planRepository.save(planEntity);
+                unfinishedPlanRepository.save(unfinishedPlanEntity);
+        }
 
-    /**
-     * @description: 获取所有未完成计划
-     * @param {*}
-     * @return {List<PlanEntity>}
-     */
-    public List<PlanEntity> getAllPlan() {
-        return planRepository.findAll();
-    }
 
-    /**
-     * @description: 添加一个任务(日期为当前)
-     * @param {*}
-     * @return {*}
-     */
-    public void addPlan(PlanEntity planEntity) {
-        UnfinishedPlanEntity unfinishedPlanEntity = new UnfinishedPlanEntity();
-        unfinishedPlanEntity.setPlanByPlanId(planEntity);
-        unfinishedPlanRepository.save(unfinishedPlanEntity);
-        // planRepository.save(planEntity);
-    }
 
+        public void finishPlan(Integer id) {
+
+        }
 }

@@ -1,3 +1,12 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @@Company: None
+ * @Author: Swithun Liu
+ * @Date: 2021-04-13 16:58:03
+ * @LastEditors: Swithun Liu
+ * @LastEditTime: 2021-04-13 17:06:24
+ */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
@@ -12,6 +21,7 @@ public class UserEntity {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }

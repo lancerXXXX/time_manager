@@ -1,6 +1,9 @@
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Objects;
@@ -24,6 +27,7 @@ public class PlanEntity {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -135,29 +139,35 @@ public class PlanEntity {
         return Objects.hash(id, planName, repeatType, expectedStartDate, expectedEndDate, expectedStartTime, expectedEndTime, practiceStartDateTime, practiceEndDateTime, ended);
     }
 
+    @JsonBackReference
     @OneToMany(mappedBy = "planByPlanId")
     public Collection<FinishedTaskRecordEntity> getFinishedTaskRecordsById() {
         return finishedTaskRecordsById;
     }
 
+    @JsonBackReference
     public void setFinishedTaskRecordsById(Collection<FinishedTaskRecordEntity> finishedTaskRecordsById) {
         this.finishedTaskRecordsById = finishedTaskRecordsById;
     }
 
+    @JsonBackReference
     @OneToMany(mappedBy = "planByPlanId")
     public Collection<UnfinishedPlanEntity> getUnfinishedPlansById() {
         return unfinishedPlansById;
     }
 
+    @JsonBackReference
     public void setUnfinishedPlansById(Collection<UnfinishedPlanEntity> unfinishedPlansById) {
         this.unfinishedPlansById = unfinishedPlansById;
     }
 
+    @JsonBackReference
     @OneToMany(mappedBy = "planByPlanId")
     public Collection<FinishedPlanEntity> getFinishedPlansById() {
         return finishedPlansById;
     }
 
+    @JsonBackReference
     public void setFinishedPlansById(Collection<FinishedPlanEntity> finishedPlansById) {
         this.finishedPlansById = finishedPlansById;
     }

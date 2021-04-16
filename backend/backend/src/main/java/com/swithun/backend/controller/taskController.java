@@ -5,14 +5,16 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-08 10:14:30
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-12 17:11:14
+ * @LastEditTime: 2021-04-16 10:27:41
  */
 package com.swithun.backend.controller;
 
 import java.util.List;
 
 import com.swithun.backend.entity.PlanEntity;
+import com.swithun.backend.entity.UnfinishedPlanEntity;
 import com.swithun.backend.service.PlanService;
+import com.swithun.backend.service.UnfinishedPlanRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +37,7 @@ public class taskController {
      * @return {List<PlanEntity>}
      */
     @GetMapping(value = "/gettaskbydate")
-    public List<PlanEntity> tasktest(@RequestParam String date) {
+    public List<UnfinishedPlanEntity> tasktest(@RequestParam String date) {
         return planService.gettaskbydate(date);
     }
     /**
@@ -44,7 +46,7 @@ public class taskController {
      * @return {List<PlanEntity>}
      */
     @GetMapping(value = "/getweekplan")
-    public List<PlanEntity> getWeekPlan(@RequestParam String date) {
+    public List<UnfinishedPlanEntity> getWeekPlan(@RequestParam String date) {
         return planService.getWeekPlan(date);
     }
 
@@ -65,7 +67,7 @@ public class taskController {
      * @return {List<PlanEntity>}
      */
     @GetMapping(value = "/getallplan")
-    public List<PlanEntity> getAllPlan() {
+    public List<UnfinishedPlanEntity> getAllPlan() {
         return planService.getAllPlan();
     }
 
