@@ -1,12 +1,23 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @@Company: None
+ * @Author: Swithun Liu
+ * @Date: 2021-04-13 16:58:03
+ * @LastEditors: Swithun Liu
+ * @LastEditTime: 2021-04-16 14:54:34
+ */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
+
 import java.util.Objects;
 
 @Entity
 @Table(name = "UnfinishedPlan", schema = "time_manger", catalog = "")
 public class UnfinishedPlanEntity {
     private Integer id;
+    // @JsonManagedReference(value = "test2")
     private PlanEntity planByPlanId;
 
     @Id

@@ -5,16 +5,16 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-08 10:14:30
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-16 10:27:41
+ * @LastEditTime: 2021-04-16 14:02:14
  */
 package com.swithun.backend.controller;
 
 import java.util.List;
 
+import com.swithun.backend.entity.FinishedTaskRecordEntity;
 import com.swithun.backend.entity.PlanEntity;
 import com.swithun.backend.entity.UnfinishedPlanEntity;
 import com.swithun.backend.service.PlanService;
-import com.swithun.backend.service.UnfinishedPlanRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,5 +70,13 @@ public class taskController {
     public List<UnfinishedPlanEntity> getAllPlan() {
         return planService.getAllPlan();
     }
+
+    @PostMapping(value="/finishplanbyonce")
+    public String postMethodName(@RequestBody FinishedTaskRecordEntity finishedTaskRecordEntity) {
+        // Timestamp 格式 2021-04-16 12:35:34.0
+        planService.finishPlanByOnce(finishedTaskRecordEntity);
+        return "添加成功";
+    }
+    
 
 }

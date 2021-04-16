@@ -1,6 +1,16 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @@Company: None
+ * @Author: Swithun Liu
+ * @Date: 2021-04-13 16:58:03
+ * @LastEditors: Swithun Liu
+ * @LastEditTime: 2021-04-16 14:40:02
+ */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
+
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -10,6 +20,7 @@ public class FinishedTaskRecordEntity {
     private Integer id;
     private Timestamp startTime;
     private Timestamp endTime;
+    // @JsonManagedReference(value = "test1")
     private PlanEntity planByPlanId;
 
     @Id
@@ -64,5 +75,8 @@ public class FinishedTaskRecordEntity {
 
     public void setPlanByPlanId(PlanEntity planByPlanId) {
         this.planByPlanId = planByPlanId;
+    }
+
+    public void save(FinishedTaskRecordEntity finishedTaskRecordEntity) {
     }
 }

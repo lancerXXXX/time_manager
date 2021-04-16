@@ -2,7 +2,7 @@ package com.swithun.backend.entity;
 
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -21,8 +21,14 @@ public class PlanEntity {
     private Timestamp practiceStartDateTime;
     private Timestamp practiceEndDateTime;
     private Byte ended;
+    // @JsonBackReference(value = "test1")
+    @JsonIgnore
     private Collection<FinishedTaskRecordEntity> finishedTaskRecordsById;
+    // @JsonBackReference(value = "test2")
+    @JsonIgnore
     private Collection<UnfinishedPlanEntity> unfinishedPlansById;
+    // @JsonBackReference(value = "test3")
+    @JsonIgnore
     private Collection<FinishedPlanEntity> finishedPlansById;
 
     @Id
@@ -139,35 +145,29 @@ public class PlanEntity {
         return Objects.hash(id, planName, repeatType, expectedStartDate, expectedEndDate, expectedStartTime, expectedEndTime, practiceStartDateTime, practiceEndDateTime, ended);
     }
 
-    @JsonBackReference
     @OneToMany(mappedBy = "planByPlanId")
     public Collection<FinishedTaskRecordEntity> getFinishedTaskRecordsById() {
         return finishedTaskRecordsById;
     }
 
-    @JsonBackReference
     public void setFinishedTaskRecordsById(Collection<FinishedTaskRecordEntity> finishedTaskRecordsById) {
         this.finishedTaskRecordsById = finishedTaskRecordsById;
     }
 
-    @JsonBackReference
     @OneToMany(mappedBy = "planByPlanId")
     public Collection<UnfinishedPlanEntity> getUnfinishedPlansById() {
         return unfinishedPlansById;
     }
 
-    @JsonBackReference
     public void setUnfinishedPlansById(Collection<UnfinishedPlanEntity> unfinishedPlansById) {
         this.unfinishedPlansById = unfinishedPlansById;
     }
 
-    @JsonBackReference
     @OneToMany(mappedBy = "planByPlanId")
     public Collection<FinishedPlanEntity> getFinishedPlansById() {
         return finishedPlansById;
     }
 
-    @JsonBackReference
     public void setFinishedPlansById(Collection<FinishedPlanEntity> finishedPlansById) {
         this.finishedPlansById = finishedPlansById;
     }

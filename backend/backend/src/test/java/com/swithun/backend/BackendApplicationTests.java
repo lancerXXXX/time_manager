@@ -5,10 +5,11 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-06 08:59:19
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-16 10:13:38
+ * @LastEditTime: 2021-04-16 15:07:53
  */
 package com.swithun.backend;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,8 +19,6 @@ import com.swithun.backend.utils.DateUtil;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import net.bytebuddy.agent.ByteBuddyAgent.AttachmentProvider.ForEmulatedAttachment;
 
 
 @SpringBootTest
@@ -41,6 +40,13 @@ class BackendApplicationTests {
 		for (UnfinishedPlanEntity unfinishedPlanEntity : unfinishedPlanEntities) {
 			System.out.println("test: " + unfinishedPlanEntity.getPlanByPlanId());
 		}
+	}
+
+	@Test
+	void testTimeStamp() {
+		Timestamp timestamp = Timestamp.valueOf("2021-04-16 12:35:34");
+		String a = timestamp.toString();
+		System.out.println("testTimeStamp    " + a);
 	}
 
 }
