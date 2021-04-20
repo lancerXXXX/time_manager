@@ -3,27 +3,25 @@
  * @version: 
  * @@Company: None
  * @Author: Swithun Liu
- * @Date: 2021-04-13 16:58:03
+ * @Date: 2021-04-20 14:09:14
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-16 14:55:33
+ * @LastEditTime: 2021-04-20 14:10:23
  */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
-
-
 import java.util.Objects;
 
 @Entity
 @Table(name = "finishedPlan", schema = "time_manger", catalog = "")
 public class FinishedPlanEntity {
     private Integer id;
-    // @JsonManagedReference(value = "test3")
     private PlanEntity planByPlanId;
 
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     public Integer getId() {
         return id;
     }
@@ -34,8 +32,10 @@ public class FinishedPlanEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         FinishedPlanEntity that = (FinishedPlanEntity) o;
         return Objects.equals(id, that.id);
     }

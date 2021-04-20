@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-08 10:14:30
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-16 14:02:14
+ * @LastEditTime: 2021-04-19 19:42:31
  */
 package com.swithun.backend.controller;
 
@@ -17,6 +17,7 @@ import com.swithun.backend.entity.UnfinishedPlanEntity;
 import com.swithun.backend.service.PlanService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
+@CrossOrigin
 public class taskController {
     @Autowired 
     PlanService planService;

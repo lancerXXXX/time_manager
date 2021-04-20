@@ -3,21 +3,19 @@
  * @version: 
  * @@Company: None
  * @Author: Swithun Liu
- * @Date: 2021-04-13 16:58:03
+ * @Date: 2021-04-20 14:09:15
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-16 14:54:34
+ * @LastEditTime: 2021-04-20 14:10:57
  */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
-
 import java.util.Objects;
 
 @Entity
 @Table(name = "UnfinishedPlan", schema = "time_manger", catalog = "")
 public class UnfinishedPlanEntity {
     private Integer id;
-    // @JsonManagedReference(value = "test2")
     private PlanEntity planByPlanId;
 
     @Id
@@ -33,8 +31,10 @@ public class UnfinishedPlanEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         UnfinishedPlanEntity that = (UnfinishedPlanEntity) o;
         return Objects.equals(id, that.id);
     }

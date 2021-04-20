@@ -1,12 +1,3 @@
-/*
- * @Descripttion: 
- * @version: 
- * @@Company: None
- * @Author: Swithun Liu
- * @Date: 2021-04-13 16:58:03
- * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-13 17:06:24
- */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
@@ -52,10 +43,13 @@ public class UserEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         UserEntity that = (UserEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(username, that.username) && Objects.equals(password, that.password);
+        return Objects.equals(id, that.id) && Objects.equals(username, that.username)
+                && Objects.equals(password, that.password);
     }
 
     @Override

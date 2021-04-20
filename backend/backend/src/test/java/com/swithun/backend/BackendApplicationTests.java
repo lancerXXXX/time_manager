@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-06 08:59:19
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-16 15:07:53
+ * @LastEditTime: 2021-04-20 14:58:11
  */
 package com.swithun.backend;
 
@@ -13,16 +13,20 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.swithun.backend.entity.PlanTypeEntity;
 import com.swithun.backend.entity.UnfinishedPlanEntity;
 import com.swithun.backend.service.PlanService;
 import com.swithun.backend.utils.DateUtil;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
 
 @SpringBootTest
 class BackendApplicationTests {
+
+	@Autowired
+	PlanService planService;
 
 	@Test
 	void contextLoads() {
@@ -47,6 +51,22 @@ class BackendApplicationTests {
 		Timestamp timestamp = Timestamp.valueOf("2021-04-16 12:35:34");
 		String a = timestamp.toString();
 		System.out.println("testTimeStamp    " + a);
+	}
+
+	@Test
+	void testAddPlanType() {
+		PlanTypeEntity planTypeEntity = new PlanTypeEntity();
+		planTypeEntity.setName("娱乐");
+		planService.addPlanType(planTypeEntity);
+	}
+
+	@Test
+	void testGetAllPlanType() {
+		List<PlanTypeEntity> ls = planService.getAllPlanType();
+		for (PlanTypeEntity planTypeEntity : ls) {
+			System.out.println(planTypeEntity.getName());
+		}
+
 	}
 
 }

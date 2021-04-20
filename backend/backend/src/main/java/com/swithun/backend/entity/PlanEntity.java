@@ -12,6 +12,7 @@ import java.util.Objects;
 @Table(name = "plan", schema = "time_manger", catalog = "")
 public class PlanEntity {
     private Integer id;
+    private String planType;
     private String planName;
     private Integer repeatType;
     private String expectedStartDate;
@@ -20,14 +21,10 @@ public class PlanEntity {
     private Timestamp expectedEndTime;
     private Timestamp practiceStartDateTime;
     private Timestamp practiceEndDateTime;
-    private Byte ended;
-    // @JsonBackReference(value = "test1")
     @JsonIgnore
     private Collection<FinishedTaskRecordEntity> finishedTaskRecordsById;
-    // @JsonBackReference(value = "test2")
     @JsonIgnore
     private Collection<UnfinishedPlanEntity> unfinishedPlansById;
-    // @JsonBackReference(value = "test3")
     @JsonIgnore
     private Collection<FinishedPlanEntity> finishedPlansById;
 
@@ -40,6 +37,16 @@ public class PlanEntity {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    @Basic
+    @Column(name = "plan_type")
+    public String getPlanType() {
+        return planType;
+    }
+
+    public void setPlanType(String planType) {
+        this.planType = planType;
     }
 
     @Basic
@@ -122,27 +129,27 @@ public class PlanEntity {
         this.practiceEndDateTime = practiceEndDateTime;
     }
 
-    @Basic
-    @Column(name = "ended")
-    public Byte getEnded() {
-        return ended;
-    }
-
-    public void setEnded(Byte ended) {
-        this.ended = ended;
-    }
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         PlanEntity that = (PlanEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(planName, that.planName) && Objects.equals(repeatType, that.repeatType) && Objects.equals(expectedStartDate, that.expectedStartDate) && Objects.equals(expectedEndDate, that.expectedEndDate) && Objects.equals(expectedStartTime, that.expectedStartTime) && Objects.equals(expectedEndTime, that.expectedEndTime) && Objects.equals(practiceStartDateTime, that.practiceStartDateTime) && Objects.equals(practiceEndDateTime, that.practiceEndDateTime) && Objects.equals(ended, that.ended);
+        return Objects.equals(id, that.id) && Objects.equals(planType, that.planType)
+                && Objects.equals(planName, that.planName) && Objects.equals(repeatType, that.repeatType)
+                && Objects.equals(expectedStartDate, that.expectedStartDate)
+                && Objects.equals(expectedEndDate, that.expectedEndDate)
+                && Objects.equals(expectedStartTime, that.expectedStartTime)
+                && Objects.equals(expectedEndTime, that.expectedEndTime)
+                && Objects.equals(practiceStartDateTime, that.practiceStartDateTime)
+                && Objects.equals(practiceEndDateTime, that.practiceEndDateTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, planName, repeatType, expectedStartDate, expectedEndDate, expectedStartTime, expectedEndTime, practiceStartDateTime, practiceEndDateTime, ended);
+        return Objects.hash(id, planType, planName, repeatType, expectedStartDate, expectedEndDate, expectedStartTime,
+                expectedEndTime, practiceStartDateTime, practiceEndDateTime);
     }
 
     @OneToMany(mappedBy = "planByPlanId")

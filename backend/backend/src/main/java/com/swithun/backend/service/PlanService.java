@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 16:42:46
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-16 11:11:15
+ * @LastEditTime: 2021-04-20 16:25:23
  */
 package com.swithun.backend.service;
 
@@ -21,9 +21,11 @@ import javax.persistence.criteria.Root;
 
 import com.swithun.backend.dao.FinishedTaskRecordRepository;
 import com.swithun.backend.dao.PlanRepository;
+import com.swithun.backend.dao.PlanTypeRepository;
 import com.swithun.backend.dao.UnfinishedPlanRepository;
 import com.swithun.backend.entity.FinishedTaskRecordEntity;
 import com.swithun.backend.entity.PlanEntity;
+import com.swithun.backend.entity.PlanTypeEntity;
 import com.swithun.backend.entity.UnfinishedPlanEntity;
 import com.swithun.backend.utils.DateUtil;
 
@@ -39,6 +41,8 @@ public class PlanService {
   private UnfinishedPlanRepository unfinishedPlanRepository;
   @Autowired
   private FinishedTaskRecordRepository finishedTaskRecordRepository;
+  @Autowired
+  private PlanTypeRepository planTypeRepository;
 
   /**
    * @description: 获取本周计划
@@ -161,4 +165,16 @@ public class PlanService {
   public void finishPlanByOnce(FinishedTaskRecordEntity finishedTaskRecordEntity) {
     finishedTaskRecordRepository.save(finishedTaskRecordEntity);
   }
+
+  public void addPlanType(PlanTypeEntity planTypeEntity) {
+    System.out.println(planTypeEntity.getId());
+    System.out.println(planTypeEntity.getName());
+    System.out.println(planTypeEntity.getPlanTypeByParentId().getId());
+    planTypeRepository.save(planTypeEntity);
+  }
+
+  public List<PlanTypeEntity> getAllPlanType() {
+    return planTypeRepository.findAllByPlanTypeByParentId(null);
+  }
+
 }
