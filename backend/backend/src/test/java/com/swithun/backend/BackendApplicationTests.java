@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-06 08:59:19
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-20 14:58:11
+ * @LastEditTime: 2021-04-21 13:49:43
  */
 package com.swithun.backend;
 
@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.swithun.backend.dao.PlanTypeRepository;
 import com.swithun.backend.entity.PlanTypeEntity;
 import com.swithun.backend.entity.UnfinishedPlanEntity;
 import com.swithun.backend.service.PlanService;
@@ -27,6 +28,9 @@ class BackendApplicationTests {
 
 	@Autowired
 	PlanService planService;
+
+	@Autowired
+	PlanTypeRepository planTypeRepository;
 
 	@Test
 	void contextLoads() {
@@ -67,6 +71,14 @@ class BackendApplicationTests {
 			System.out.println(planTypeEntity.getName());
 		}
 
+	}
+
+	@Test
+	void testDeletePlanType() {
+		PlanTypeEntity planTypeEntity = new PlanTypeEntity();
+		planTypeEntity.setId(11);
+		planTypeEntity.setName("几何1.0");
+		planService.updatePlanTypeName(planTypeEntity);
 	}
 
 }

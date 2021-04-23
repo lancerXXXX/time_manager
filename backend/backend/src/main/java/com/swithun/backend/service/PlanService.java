@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 16:42:46
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-20 16:25:23
+ * @LastEditTime: 2021-04-22 09:43:03
  */
 package com.swithun.backend.service;
 
@@ -169,12 +169,28 @@ public class PlanService {
   public void addPlanType(PlanTypeEntity planTypeEntity) {
     System.out.println(planTypeEntity.getId());
     System.out.println(planTypeEntity.getName());
-    System.out.println(planTypeEntity.getPlanTypeByParentId().getId());
+    // System.out.println(planTypeEntity.getPlanTypeByParentId().getId());
     planTypeRepository.save(planTypeEntity);
   }
 
   public List<PlanTypeEntity> getAllPlanType() {
     return planTypeRepository.findAllByPlanTypeByParentId(null);
+  }
+
+  public void updatePlanTypeName(PlanTypeEntity planTypeEntity) {
+    PlanTypeEntity old = planTypeRepository.findById(planTypeEntity.getId()).get();
+    old.setName(planTypeEntity.getName());
+    planTypeRepository.save(old);
+  }
+
+  public void deletePlanType(PlanTypeEntity planTypeEntity){
+    PlanTypeEntity originPlanTypeEntity = planTypeRepository.findById(planTypeEntity.getId()).get();
+    planTypeRepository.deleteAll(originPlanTypeEntity.getPlanTypesById());
+    planTypeRepository.delete(originPlanTypeEntity);
+  }
+
+  public PlanTypeEntity getPlanTypeEntityByName(String name) {
+    return planTypeRepository.findOneByName(name);
   }
 
 }
