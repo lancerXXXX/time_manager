@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-22 10:11:35
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-22 11:04:05
+ * @LastEditTime: 2021-04-23 11:05:40
  */
 package com.swithun.backend.controller;
 
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import com.swithun.backend.DTO.getOrderLimitDTO;
 import com.swithun.backend.entity.OrderLimitEntity;
 import com.swithun.backend.service.LimitService;
 
@@ -38,7 +39,7 @@ public class LimitController {
     }
 
     @GetMapping(value="/rule/order/getAllRule")
-    public List<OrderLimitEntity> getMethodName() {
+    public List<getOrderLimitDTO> getMethodName() {
         return limitService.getAllOrderLimit();
     }
 
