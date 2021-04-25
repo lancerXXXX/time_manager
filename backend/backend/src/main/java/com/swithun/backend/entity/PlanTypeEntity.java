@@ -5,16 +5,13 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-20 14:09:15
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-22 10:59:37
+ * @LastEditTime: 2021-04-23 15:51:17
  */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Collection;
@@ -23,7 +20,14 @@ import java.util.Objects;
 @Entity
 @Table(name = "planType", schema = "time_manger", catalog = "")
 public class PlanTypeEntity {
-    private Integer id;
+    public PlanTypeEntity() {
+	}
+
+	public PlanTypeEntity(Integer id) {
+		this.id = id;
+	}
+
+	private Integer id;
     private String name;
     @JsonIgnore
     private PlanTypeEntity planTypeByParentId;
