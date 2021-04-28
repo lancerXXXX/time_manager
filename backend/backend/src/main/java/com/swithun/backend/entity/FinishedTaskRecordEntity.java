@@ -1,15 +1,23 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @@Company: None
+ * @Author: Swithun Liu
+ * @Date: 2021-04-28 16:05:48
+ * @LastEditors: Swithun Liu
+ * @LastEditTime: 2021-04-28 16:44:33
+ */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
 @Table(name = "FinishedTaskRecord", schema = "time_manger", catalog = "")
 public class FinishedTaskRecordEntity {
     private Integer id;
-    private Timestamp startTime;
-    private Timestamp endTime;
+    private String startTime;
+    private String endTime;
     private PlanEntity planByPlanId;
 
     @Id
@@ -25,21 +33,21 @@ public class FinishedTaskRecordEntity {
 
     @Basic
     @Column(name = "start_time")
-    public Timestamp getStartTime() {
+    public String getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Timestamp startTime) {
+    public void setStartTime(String startTime) {
         this.startTime = startTime;
     }
 
     @Basic
     @Column(name = "end_time")
-    public Timestamp getEndTime() {
+    public String getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Timestamp endTime) {
+    public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
 
