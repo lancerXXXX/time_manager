@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-20 14:09:15
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-23 15:51:17
+ * @LastEditTime: 2021-04-26 10:12:27
  */
 package com.swithun.backend.entity;
 
@@ -21,22 +21,27 @@ import java.util.Objects;
 @Table(name = "planType", schema = "time_manger", catalog = "")
 public class PlanTypeEntity {
     public PlanTypeEntity() {
-	}
+    }
 
-	public PlanTypeEntity(Integer id) {
-		this.id = id;
-	}
+    public PlanTypeEntity(Integer id) {
+        this.id = id;
+    }
 
-	private Integer id;
+    private Integer id;
     private String name;
     @JsonIgnore
     private PlanTypeEntity planTypeByParentId;
     private Collection<PlanTypeEntity> planTypesById;
-
     @JsonIgnore
     private Collection<OrderLimitEntity> orderLimitsById;
     @JsonIgnore
     private Collection<OrderLimitEntity> orderLimitsById_0;
+    @JsonIgnore
+    private Collection<PlanEntity> plansById;
+    @JsonIgnore
+    private Collection<TimeLimitEntity> timeLimitsById;
+    @JsonIgnore
+    private Collection<FrequencyLimitEntity> frequencyLimitsById;
 
     @Id
     @Column(name = "id")
@@ -92,8 +97,6 @@ public class PlanTypeEntity {
         this.orderLimitsById_0 = orderLimitsById_0;
     }
 
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id", referencedColumnName = "id")
     public PlanTypeEntity getPlanTypeByParentId() {
@@ -112,5 +115,32 @@ public class PlanTypeEntity {
 
     public void setPlanTypesById(Collection<PlanTypeEntity> planTypesById) {
         this.planTypesById = planTypesById;
+    }
+
+    @OneToMany(mappedBy = "planTypeByPlanType")
+    public Collection<PlanEntity> getPlansById() {
+        return plansById;
+    }
+
+    public void setPlansById(Collection<PlanEntity> plansById) {
+        this.plansById = plansById;
+    }
+
+    @OneToMany(mappedBy = "planTypeByPlanTypeId")
+    public Collection<TimeLimitEntity> getTimeLimitsById() {
+        return timeLimitsById;
+    }
+
+    public void setTimeLimitsById(Collection<TimeLimitEntity> timeLimitsById) {
+        this.timeLimitsById = timeLimitsById;
+    }
+
+    @OneToMany(mappedBy = "planTypeByPlanTypeId")
+    public Collection<FrequencyLimitEntity> getFrequencyLimitsById() {
+        return frequencyLimitsById;
+    }
+
+    public void setFrequencyLimitsById(Collection<FrequencyLimitEntity> frequencyLimitsById) {
+        this.frequencyLimitsById = frequencyLimitsById;
     }
 }

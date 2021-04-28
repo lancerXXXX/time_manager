@@ -12,7 +12,6 @@ import java.util.Objects;
 @Table(name = "plan", schema = "time_manger", catalog = "")
 public class PlanEntity {
     private Integer id;
-    private String planType;
     private String planName;
     private Integer repeatType;
     private String expectedStartDate;
@@ -27,6 +26,7 @@ public class PlanEntity {
     private Collection<UnfinishedPlanEntity> unfinishedPlansById;
     @JsonIgnore
     private Collection<FinishedPlanEntity> finishedPlansById;
+    private PlanTypeEntity planTypeByPlanType;
 
     @Id
     @Column(name = "id")
@@ -37,16 +37,6 @@ public class PlanEntity {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    @Basic
-    @Column(name = "plan_type")
-    public String getPlanType() {
-        return planType;
-    }
-
-    public void setPlanType(String planType) {
-        this.planType = planType;
     }
 
     @Basic
@@ -136,8 +126,8 @@ public class PlanEntity {
         if (o == null || getClass() != o.getClass())
             return false;
         PlanEntity that = (PlanEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(planType, that.planType)
-                && Objects.equals(planName, that.planName) && Objects.equals(repeatType, that.repeatType)
+        return Objects.equals(id, that.id) && Objects.equals(planName, that.planName)
+                && Objects.equals(repeatType, that.repeatType)
                 && Objects.equals(expectedStartDate, that.expectedStartDate)
                 && Objects.equals(expectedEndDate, that.expectedEndDate)
                 && Objects.equals(expectedStartTime, that.expectedStartTime)
@@ -148,7 +138,7 @@ public class PlanEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, planType, planName, repeatType, expectedStartDate, expectedEndDate, expectedStartTime,
+        return Objects.hash(id, planName, repeatType, expectedStartDate, expectedEndDate, expectedStartTime,
                 expectedEndTime, practiceStartDateTime, practiceEndDateTime);
     }
 
@@ -177,5 +167,15 @@ public class PlanEntity {
 
     public void setFinishedPlansById(Collection<FinishedPlanEntity> finishedPlansById) {
         this.finishedPlansById = finishedPlansById;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "plan_type", referencedColumnName = "id")
+    public PlanTypeEntity getPlanTypeByPlanType() {
+        return planTypeByPlanType;
+    }
+
+    public void setPlanTypeByPlanType(PlanTypeEntity planTypeByPlanType) {
+        this.planTypeByPlanType = planTypeByPlanType;
     }
 }
