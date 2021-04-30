@@ -13,6 +13,12 @@ package com.swithun.backend.DTO;
 import java.util.List;
 
 public class AddStatisticTemplateDTO {
+    public Integer getId() {
+        return id;
+    }
+    public void setId(Integer id) {
+        this.id = id;
+    }
     public String getTemplateName() {
         return templateName;
     }
@@ -49,6 +55,7 @@ public class AddStatisticTemplateDTO {
     public void setSatisfaction(List<StSatisfactionDTO> satisfaction) {
         this.satisfaction = satisfaction;
     }
+    private Integer id;
     private String templateName;
     private List<StTimeDTO> time;
     private List<String> name;

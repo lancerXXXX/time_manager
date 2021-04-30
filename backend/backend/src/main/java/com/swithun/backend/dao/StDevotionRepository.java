@@ -1,12 +1,15 @@
 package com.swithun.backend.dao;
 
 import com.swithun.backend.entity.StDevotionEntity;
+import com.swithun.backend.entity.StatisticTemplateEntity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StDevotionRepository extends JpaRepository<StDevotionEntity, Integer> {
+
+	void deleteByStatisticTemplateByStId(StatisticTemplateEntity st);
     
 }
 /*

@@ -7,6 +7,13 @@ import java.util.Objects;
 @Entity
 @Table(name = "statisticTemplate", schema = "time_manger", catalog = "")
 public class StatisticTemplateEntity {
+    public StatisticTemplateEntity(Integer id) {
+        this.id = id;
+    }
+
+    public StatisticTemplateEntity() {
+    }
+
     public StatisticTemplateEntity(String templeteName) {
         this.templeteName = templeteName;
     }
@@ -53,7 +60,7 @@ public class StatisticTemplateEntity {
         return Objects.hash(id, templeteName);
     }
 
-    @OneToMany(mappedBy = "statisticTemplateByStId")
+    @OneToMany(mappedBy = "statisticTemplateByStId", cascade = CascadeType.ALL)
     public Collection<StDevotionEntity> getStDevotionsById() {
         return stDevotionsById;
     }
@@ -62,16 +69,16 @@ public class StatisticTemplateEntity {
         this.stDevotionsById = stDevotionsById;
     }
 
-    @OneToMany(mappedBy = "statisticTemplateByStId")
+    @OneToMany(mappedBy = "statisticTemplateByStId", cascade = CascadeType.ALL)
     public Collection<StNameEntity> getStNamesById() {
         return stNamesById;
     }
-
+/*  */
     public void setStNamesById(Collection<StNameEntity> stNamesById) {
         this.stNamesById = stNamesById;
     }
 
-    @OneToMany(mappedBy = "statisticTemplateByStId")
+    @OneToMany(mappedBy = "statisticTemplateByStId", cascade = CascadeType.ALL)
     public Collection<StSatisfactionEntity> getStSatisfactionsById() {
         return stSatisfactionsById;
     }
@@ -80,7 +87,7 @@ public class StatisticTemplateEntity {
         this.stSatisfactionsById = stSatisfactionsById;
     }
 
-    @OneToMany(mappedBy = "statisticTemplateByStId")
+    @OneToMany(mappedBy = "statisticTemplateByStId", cascade = CascadeType.ALL)
     public Collection<StTimeEntity> getStTimesById() {
         return stTimesById;
     }
@@ -89,7 +96,7 @@ public class StatisticTemplateEntity {
         this.stTimesById = stTimesById;
     }
 
-    @OneToMany(mappedBy = "statisticTemplateByStId")
+    @OneToMany(mappedBy = "statisticTemplateByStId", cascade = CascadeType.ALL)
     public Collection<StTypeEntity> getStTypesById() {
         return stTypesById;
     }
