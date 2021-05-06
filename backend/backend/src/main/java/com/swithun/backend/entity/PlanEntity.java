@@ -12,6 +12,13 @@ import java.util.Objects;
 @Table(name = "plan", schema = "time_manger", catalog = "")
 public class PlanEntity {
 
+    public PlanEntity() {
+    }
+
+    public PlanEntity(Integer id) {
+        this.id = id;
+    }
+
     private Integer id;
     private String planName;
     private Integer repeatType;
@@ -46,6 +53,11 @@ public class PlanEntity {
     private Collection<SubTaskEntity> subTasksById;
     @JsonIgnore
     private Collection<TrackEntity> tracksById;
+
+    @JsonIgnore
+    private Collection<RelationEntity> relationsById;// 当前plan
+    @JsonIgnore
+    private Collection<RelationEntity> relationsById_0; // plan前驱
 
     @Id
     @Column(name = "id")
@@ -241,7 +253,7 @@ public class PlanEntity {
                 practiceEndDateTime, devotion, satisfaction, time, note);
     }
 
-    @OneToMany(mappedBy = "planByPlanId")
+    @OneToMany(mappedBy = "planByPlanId", cascade = CascadeType.ALL)
     public Collection<FinishedTaskRecordEntity> getFinishedTaskRecordsById() {
         return finishedTaskRecordsById;
     }
@@ -250,7 +262,7 @@ public class PlanEntity {
         this.finishedTaskRecordsById = finishedTaskRecordsById;
     }
 
-    @OneToMany(mappedBy = "planByPlanId")
+    @OneToMany(mappedBy = "planByPlanId", cascade = CascadeType.ALL)
     public Collection<UnfinishedPlanEntity> getUnfinishedPlansById() {
         return unfinishedPlansById;
     }
@@ -259,7 +271,7 @@ public class PlanEntity {
         this.unfinishedPlansById = unfinishedPlansById;
     }
 
-    @OneToMany(mappedBy = "planByPlanId")
+    @OneToMany(mappedBy = "planByPlanId", cascade = CascadeType.ALL)
     public Collection<FinishedPlanEntity> getFinishedPlansById() {
         return finishedPlansById;
     }
@@ -287,12 +299,30 @@ public class PlanEntity {
         this.subTasksById = subTasksById;
     }
 
-    @OneToMany(mappedBy = "planByParentPlan")
+    @OneToMany(mappedBy = "planByParentPlan", cascade = CascadeType.ALL)
     public Collection<TrackEntity> getTracksById() {
         return tracksById;
     }
 
     public void setTracksById(Collection<TrackEntity> tracksById) {
         this.tracksById = tracksById;
+    }
+
+    @OneToMany(mappedBy = "planByPlanId", cascade = CascadeType.ALL)
+    public Collection<RelationEntity> getRelationsById() {
+        return relationsById;
+    }
+
+    public void setRelationsById(Collection<RelationEntity> relationsById) {
+        this.relationsById = relationsById;
+    }
+
+    @OneToMany(mappedBy = "planByPrePlanId", cascade = CascadeType.ALL)
+    public Collection<RelationEntity> getRelationsById_0() {
+        return relationsById_0;
+    }
+
+    public void setRelationsById_0(Collection<RelationEntity> relationsById_0) {
+        this.relationsById_0 = relationsById_0;
     }
 }

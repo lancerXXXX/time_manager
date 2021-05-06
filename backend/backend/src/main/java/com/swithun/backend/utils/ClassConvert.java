@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-30 15:03:48
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-06 09:55:58
+ * @LastEditTime: 2021-05-06 13:48:10
  */
 package com.swithun.backend.utils;
 
@@ -16,6 +16,7 @@ import com.swithun.backend.entity.StSatisfactionEntity;
 import com.swithun.backend.entity.StTimeEntity;
 import com.swithun.backend.entity.StTypeEntity;
 import com.swithun.backend.entity.StatisticTemplateEntity;
+import com.swithun.backend.entity.UnfinishedPlanEntity;
 
 import org.springframework.stereotype.Component;
 
@@ -160,5 +161,6 @@ public class ClassConvert {
             }
         }
     }
+
 
 }

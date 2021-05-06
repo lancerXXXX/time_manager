@@ -5,12 +5,18 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 16:42:46
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-06 09:44:58
+ * @LastEditTime: 2021-05-06 16:04:02
  */
 package com.swithun.backend.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -24,6 +30,7 @@ import com.swithun.backend.dao.FinishedPlanRepository;
 import com.swithun.backend.dao.FinishedTaskRecordRepository;
 import com.swithun.backend.dao.PlanRepository;
 import com.swithun.backend.dao.PlanTypeRepository;
+import com.swithun.backend.dao.RelationRepository;
 import com.swithun.backend.dao.TrackRepository;
 import com.swithun.backend.dao.UnfinishedPlanRepository;
 import com.swithun.backend.dao.subTaskRepository;
@@ -31,6 +38,7 @@ import com.swithun.backend.entity.FinishedPlanEntity;
 import com.swithun.backend.entity.FinishedTaskRecordEntity;
 import com.swithun.backend.entity.PlanEntity;
 import com.swithun.backend.entity.PlanTypeEntity;
+import com.swithun.backend.entity.RelationEntity;
 import com.swithun.backend.entity.SubTaskEntity;
 import com.swithun.backend.entity.TrackEntity;
 import com.swithun.backend.entity.UnfinishedPlanEntity;
@@ -59,6 +67,8 @@ public class PlanService {
   private subTaskRepository subTaskR;
   @Autowired
   private TrackRepository trackR;
+  @Autowired
+  private RelationRepository relationR;
   @Autowired
   private ClassConvert conveter;
 
@@ -157,6 +167,66 @@ public class PlanService {
 
   }
 
+  public Map<String, Object> dealWithGetAllPlan(String date) {
+    // 0 获取所有这一天的任务(确定时间的 任务)
+    List<UnfinishedPlanEntity> ufPlans = gettaskbydate(date);
+
+    Map<String, Object> mp = new ConcurrentHashMap<>();
+    List<PlanEntity> orderLimitedPlans = new ArrayList<>();
+    List<PlanEntity> timeLimitedPlans = new ArrayList<>();
+
+    Set<Integer> orderLimitedPlanIdSet = new HashSet<>();
+    // 1. 处理 时间限制 计划
+    for (UnfinishedPlanEntity ufPlan : ufPlans) {
+      PlanEntity plan = ufPlan.getPlanByPlanId();
+      if (plan.getExpectedStartDate() != null) { // 如果有时间
+        timeLimitedPlans.add(plan);
+        orderLimitedPlanIdSet.add(plan.getId());
+        orderLimitedPlans.add(plan);
+      }
+    }
+    mp.put("timeLimitedPlanSet", timeLimitedPlans);
+    // 2. 处理顺序限制 邻接表
+    List<RelationEntity> allRelation = relationR.findAll();// 获取所有 relation
+    Map<String, Set<Integer>> piles = new ConcurrentHashMap<>();
+    Set<Integer> checkedOrderId = new HashSet<>();
+    boolean notFinish = false;
+    do {
+      notFinish = false;
+      for (RelationEntity relation : allRelation) {
+        if (!checkedOrderId.contains(relation.getId())) {
+          Integer pre = relation.getPlanByPrePlanId().getId();
+          Integer back = relation.getPlanByPlanId().getId();
+          String pre_str = String.valueOf(pre);
+          if (orderLimitedPlanIdSet.contains(pre) || orderLimitedPlanIdSet.contains(back)) {
+            notFinish = true;
+            checkedOrderId.add(relation.getId());
+            if (!orderLimitedPlanIdSet.contains(pre)) {
+              orderLimitedPlanIdSet.add(pre);
+              orderLimitedPlans.add(relation.getPlanByPrePlanId());
+            }
+            if (!orderLimitedPlanIdSet.contains(back)) {
+              orderLimitedPlanIdSet.add(back);
+              orderLimitedPlans.add(relation.getPlanByPlanId());
+            }
+            if (!piles.containsKey(pre_str)) {
+              piles.put(pre_str, new HashSet<>());
+            }
+            piles.get(pre_str).add(back);
+          }
+        }
+      }
+    } while (notFinish);
+
+    mp.put("planRelation", piles);
+
+    // 3. 处理顺序限制 plan
+
+    mp.put("orderLimitedPlanSet", orderLimitedPlans);
+
+    return mp;
+  }
+
   /**
    * @description: 获取所有未完成计划
    * @param {*}
@@ -177,9 +247,13 @@ public class PlanService {
     conveter.completeAddPlan(plan);
     System.out.println("addPlan " + plan.getExpectedStartDate());
 
-    // 1. 保存 plan
+    // 1 将subPlan 的plan设置为 当前plan
+    for (SubTaskEntity subTask : plan.getSubTasksById()) {
+      subTask.setPlanByParentPlan(plan);
+    }
+    // 2. 保存 plan
     planR.save(plan);
-    // 2. 在 未完成计划中登记
+    // 3. 在 未完成计划中登记
     UnfinishedPlanEntity unfinishedPlanEntity = new UnfinishedPlanEntity();
     unfinishedPlanEntity.setPlanByPlanId(plan);
     ufPlanR.save(unfinishedPlanEntity);
@@ -192,7 +266,6 @@ public class PlanService {
   public void addPlanType(PlanTypeEntity planTypeEntity) {
     System.out.println(planTypeEntity.getId());
     System.out.println(planTypeEntity.getName());
-    // System.out.println(planTypeEntity.getPlanTypeByParentId().getId());
     planTypeR.save(planTypeEntity);
   }
 
@@ -246,6 +319,55 @@ public class PlanService {
     FinishedPlanEntity finishedPlanEntity = new FinishedPlanEntity();
     finishedPlanEntity.setPlanByPlanId(rtPlan);
     fPlanR.save(finishedPlanEntity);
+  }
+
+  public void addRelation(Integer plan_id, Integer pre_plan_id) {
+    PlanEntity plan = new PlanEntity(plan_id);
+    PlanEntity prePlan = new PlanEntity(pre_plan_id);
+    RelationEntity relation = new RelationEntity();
+    relation.setPlanByPlanId(plan);
+    relation.setPlanByPrePlanId(prePlan);
+    relationR.save(relation);
+  }
+
+  public void updateRelation(Map<String, Object> mp) {
+    Integer updateType = (Integer) mp.get("type");
+    List<Integer> relation = (List<Integer>) mp.get("relation");
+    if (updateType == 0) {
+      System.out.println("删除前");
+      relationR.deleteAllByPlanByPlanIdAndPlanByPrePlanId(new PlanEntity(relation.get(1)),
+          new PlanEntity(relation.get(0)));
+      System.out.println("删除后");
+      RelationEntity newRelation = new RelationEntity();
+      newRelation.setPlanByPlanId(new PlanEntity(relation.get(2)));
+      newRelation.setPlanByPrePlanId(new PlanEntity(relation.get(0)));
+      relationR.save(newRelation);
+    } else {
+      relationR.deleteAllByPlanByPlanIdAndPlanByPrePlanId(new PlanEntity(relation.get(0)),
+          new PlanEntity(relation.get(1)));
+      RelationEntity newRelation = new RelationEntity();
+      newRelation.setPlanByPlanId(new PlanEntity(relation.get(0)));
+      newRelation.setPlanByPrePlanId(new PlanEntity(relation.get(2)));
+      relationR.save(newRelation);
+    }
+  }
+
+  public void deleteRelation(Map<String, Object> mp) {
+    List<Integer> relation = (List<Integer>)mp.get("relation");
+    PlanEntity plan = new PlanEntity();
+    plan.setId(relation.get(0));
+    PlanEntity prePlan = new PlanEntity();
+    prePlan.setId(relation.get(1));
+    relationR.deleteAllByPlanByPlanIdAndPlanByPrePlanId(plan, prePlan);
+  }
+
+  public void deletePlan(PlanEntity plan) {
+    plan = planR.findById(plan.getId()).get();
+    System.out.println("plan ID " + plan.getId());
+    List<UnfinishedPlanEntity> ufPlans = new ArrayList<>(plan.getUnfinishedPlansById());
+    plan.getUnfinishedPlansById().removeAll(ufPlans);
+    ufPlanR.deleteAll(ufPlans);
+    planR.delete(plan);
   }
 
 }

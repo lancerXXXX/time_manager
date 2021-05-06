@@ -46,16 +46,6 @@ public class taskController {
     private ClassConvert converter;
 
     /**
-     * @description: 获取当天的task
-     * @param {*}
-     * @return {List<PlanEntity>}
-     */
-    @GetMapping(value = "/plan/gettaskbydate")
-    public List<UnfinishedPlanEntity> tasktest(@RequestParam String date) {
-        String dateStr = DateUtil.TimeStamp2LocalDateStr(date);
-        return planS.gettaskbydate(dateStr);
-    }
-    /**
      * @description: 获取本周计划
      * @param {String date} date = "" 则默认取当日
      * @return {List<PlanEntity>}

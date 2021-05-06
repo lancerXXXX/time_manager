@@ -5,11 +5,14 @@
  * @Author: Swithun Liu
  * @Date: 2021-05-05 21:10:28
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-06 09:12:59
+ * @LastEditTime: 2021-05-06 10:47:39
  */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Objects;
 
 @Entity
@@ -20,6 +23,7 @@ public class SubTaskEntity {
     private String name;
     private Integer time;
     private Integer expectedTime;
+    @JsonIgnore
     private PlanEntity planByParentPlan;
 
     @Id
