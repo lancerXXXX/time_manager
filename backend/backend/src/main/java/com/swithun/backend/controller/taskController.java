@@ -5,17 +5,25 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-08 10:14:30
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-28 20:51:26
+ * @LastEditTime: 2021-05-06 09:31:08
  */
 package com.swithun.backend.controller;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 import com.swithun.backend.DTO.addTaskDTO;
 import com.swithun.backend.entity.FinishedTaskRecordEntity;
 import com.swithun.backend.entity.PlanEntity;
 import com.swithun.backend.entity.UnfinishedPlanEntity;
 import com.swithun.backend.service.PlanService;
+import com.swithun.backend.utils.ClassConvert;
+import com.swithun.backend.utils.DateUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -32,36 +40,29 @@ import org.springframework.web.bind.annotation.RequestParam;
 @CrossOrigin
 public class taskController {
     @Autowired 
-    PlanService planS;
+    private PlanService planS;
+
+    @Autowired
+    private ClassConvert converter;
 
     /**
      * @description: 获取当天的task
      * @param {*}
      * @return {List<PlanEntity>}
      */
-    @GetMapping(value = "/gettaskbydate")
+    @GetMapping(value = "/plan/gettaskbydate")
     public List<UnfinishedPlanEntity> tasktest(@RequestParam String date) {
-        return planS.gettaskbydate(date);
+        String dateStr = DateUtil.TimeStamp2LocalDateStr(date);
+        return planS.gettaskbydate(dateStr);
     }
     /**
      * @description: 获取本周计划
      * @param {String date} date = "" 则默认取当日
      * @return {List<PlanEntity>}
      */
-    @GetMapping(value = "/getweekplan")
+    @GetMapping(value = "/plan/getweekplan")
     public List<UnfinishedPlanEntity> getWeekPlan(@RequestParam String date) {
         return planS.getWeekPlan(date);
-    }
-
-    /**
-     * @description: 添加一个任务(日期为当前)
-     * @param {*}
-     * @return {*}
-     */
-    @PostMapping(value = "/addtask")
-    public String addPlan(@RequestBody PlanEntity planEntity) {
-        planS.addPlan(planEntity);
-        return "添加成功";
     }
 
     /**

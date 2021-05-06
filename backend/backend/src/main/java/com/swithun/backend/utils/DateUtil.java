@@ -5,15 +5,19 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 15:52:48
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-16 10:14:28
+ * @LastEditTime: 2021-05-06 09:24:51
  */
 package com.swithun.backend.utils;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
 
+import org.graalvm.compiler.lir.aarch64.AArch64Move.LoadAddressOp;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -61,5 +65,14 @@ public class DateUtil {
         strs[4] = strs[0].substring(8); // 上周日 day
         strs[5] = strs[1].substring(8); // 下周一 day
         return strs;
+    }
+
+    public static String TimeStamp2LocalDateStr(String timeStampStr) {
+        long timestamp = Long.valueOf(timeStampStr);
+        LocalDate localDate = Instant.ofEpochMilli(timestamp).atZone(ZoneOffset.ofHours(8)).toLocalDate();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String dateStr =localDate.format(fmt);
+        System.out.println("DateUtil: " + dateStr);
+        return dateStr;
     }
 }

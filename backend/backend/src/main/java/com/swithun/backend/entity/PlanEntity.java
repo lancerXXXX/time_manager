@@ -11,15 +11,24 @@ import java.util.Objects;
 @Entity
 @Table(name = "plan", schema = "time_manger", catalog = "")
 public class PlanEntity {
+
     private Integer id;
     private String planName;
     private Integer repeatType;
+    // 0 不重复 ymd
+    // 1 周重复 1-7
+    // 2 月重复 d
+    // 3 年重复 md
     private String expectedStartDate;
     private String expectedEndDate;
-    private String expectedStartTime;
-    private String expectedEndTime;
+    private String expectedStartTimeBegin;
+    private String expectedStartTimeEnd;
+    private String expectedEndTimeBegin;
+    private String expectedEndTimeEnd;
     private String practiceStartDateTime;
     private String practiceEndDateTime;
+    private Integer x;
+    private Integer y;
     private Integer devotion;
     private Integer satisfaction;
     private Integer time;
@@ -32,7 +41,8 @@ public class PlanEntity {
     private Collection<FinishedPlanEntity> finishedPlansById;
     @JsonProperty("type")
     private PlanTypeEntity planTypeByPlanType;
-    @JsonIgnore
+    // @JsonIgnore
+    @JsonProperty("subTasks")
     private Collection<SubTaskEntity> subTasksById;
     @JsonIgnore
     private Collection<TrackEntity> tracksById;
@@ -42,6 +52,66 @@ public class PlanEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
+    }
+
+    @Basic
+    @Column(name = "expected_start_time_begin")
+    public String getExpectedStartTimeBegin() {
+        return expectedStartTimeBegin;
+    }
+
+    public void setExpectedStartTimeBegin(String expectedStartTimeBegin) {
+        this.expectedStartTimeBegin = expectedStartTimeBegin;
+    }
+
+    @Basic
+    @Column(name = "expected_start_time_end")
+    public String getExpectedStartTimeEnd() {
+        return expectedStartTimeEnd;
+    }
+
+    public void setExpectedStartTimeEnd(String expectedStartTimeEnd) {
+        this.expectedStartTimeEnd = expectedStartTimeEnd;
+    }
+
+    @Basic
+    @Column(name = "expected_end_time_begin")
+    public String getExpectedEndTimeBegin() {
+        return expectedEndTimeBegin;
+    }
+
+    public void setExpectedEndTimeBegin(String expectedEndTimeBegin) {
+        this.expectedEndTimeBegin = expectedEndTimeBegin;
+    }
+
+    @Basic
+    @Column(name = "expected_end_time_end")
+    public String getExpectedEndTimeEnd() {
+        return expectedEndTimeEnd;
+    }
+
+    public void setExpectedEndTimeEnd(String expectedEndTimeEnd) {
+        this.expectedEndTimeEnd = expectedEndTimeEnd;
+    }
+
+    @Basic
+    @Column(name = "x")
+    public Integer getX() {
+        return x;
+    }
+
+    public void setX(Integer x) {
+        this.x = x;
+    }
+
+    @Basic
+    @Column(name = "y")
+    public Integer getY() {
+        return y;
+    }
+
+    public void setY(Integer y) {
+        this.y = y;
     }
 
     public void setId(Integer id) {
@@ -86,26 +156,6 @@ public class PlanEntity {
 
     public void setExpectedEndDate(String expectedEndDate) {
         this.expectedEndDate = expectedEndDate;
-    }
-
-    @Basic
-    @Column(name = "expected_start_time")
-    public String getExpectedStartTime() {
-        return expectedStartTime;
-    }
-
-    public void setExpectedStartTime(String expectedStartTime) {
-        this.expectedStartTime = expectedStartTime;
-    }
-
-    @Basic
-    @Column(name = "expected_end_time")
-    public String getExpectedEndTime() {
-        return expectedEndTime;
-    }
-
-    public void setExpectedEndTime(String expectedEndTime) {
-        this.expectedEndTime = expectedEndTime;
     }
 
     @Basic
@@ -179,8 +229,6 @@ public class PlanEntity {
                 && Objects.equals(repeatType, that.repeatType)
                 && Objects.equals(expectedStartDate, that.expectedStartDate)
                 && Objects.equals(expectedEndDate, that.expectedEndDate)
-                && Objects.equals(expectedStartTime, that.expectedStartTime)
-                && Objects.equals(expectedEndTime, that.expectedEndTime)
                 && Objects.equals(practiceStartDateTime, that.practiceStartDateTime)
                 && Objects.equals(practiceEndDateTime, that.practiceEndDateTime)
                 && Objects.equals(devotion, that.devotion) && Objects.equals(satisfaction, that.satisfaction)
@@ -189,8 +237,8 @@ public class PlanEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, planName, repeatType, expectedStartDate, expectedEndDate, expectedStartTime,
-                expectedEndTime, practiceStartDateTime, practiceEndDateTime, devotion, satisfaction, time, note);
+        return Objects.hash(id, planName, repeatType, expectedStartDate, expectedEndDate, practiceStartDateTime,
+                practiceEndDateTime, devotion, satisfaction, time, note);
     }
 
     @OneToMany(mappedBy = "planByPlanId")
@@ -230,7 +278,7 @@ public class PlanEntity {
         this.planTypeByPlanType = planTypeByPlanType;
     }
 
-    @OneToMany(mappedBy = "planByParentPlan")
+    @OneToMany(mappedBy = "planByParentPlan", cascade = CascadeType.ALL)
     public Collection<SubTaskEntity> getSubTasksById() {
         return subTasksById;
     }

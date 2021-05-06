@@ -5,10 +5,11 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-30 15:03:48
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-30 16:39:22
+ * @LastEditTime: 2021-05-06 09:55:58
  */
 package com.swithun.backend.utils;
 
+import com.swithun.backend.entity.PlanEntity;
 import com.swithun.backend.entity.StDevotionEntity;
 import com.swithun.backend.entity.StNameEntity;
 import com.swithun.backend.entity.StSatisfactionEntity;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.swithun.backend.DTO.AddStatisticTemplateDTO;
 import com.swithun.backend.DTO.StDevotionDTO;
@@ -121,7 +123,8 @@ public class ClassConvert {
         return t_satisfaction;
     }
 
-    public void statisticTemplateDTO2StatisticTemplateEntity(StatisticTemplateEntity origin_st, AddStatisticTemplateDTO dto) {
+    public void statisticTemplateDTO2StatisticTemplateEntity(StatisticTemplateEntity origin_st,
+            AddStatisticTemplateDTO dto) {
         // 1. create time
         origin_st.setStTimesById(StTimeDTOs2StTimeEntities(dto.getTime(), origin_st));
         // 2. add name
@@ -133,6 +136,29 @@ public class ClassConvert {
         // 5. create satisfaction
         origin_st.setStSatisfactionsById(stSatisfactionDTOs2StSatisfactionEntities(dto.getSatisfaction(), origin_st));
 
+    }
+
+    public void completeAddPlan(PlanEntity plan) {
+
+        // 1 如果 repeatType 默认 不重复
+        if (plan.getRepeatType() == null) {
+            plan.setRepeatType(0);
+        }
+        if (plan.getRepeatType() == 0) {
+            // 2 如果 日期 未赋值 从时间戳中取出 ymd
+            if (plan.getExpectedEndDate() == null) {
+                String expectedStartTimeBegin = plan.getExpectedStartTimeBegin();
+                String expectedEndTimeEnd = plan.getExpectedEndTimeEnd();
+                if (expectedStartTimeBegin != null) {
+                    String expectedStartDate = DateUtil.TimeStamp2LocalDateStr(expectedStartTimeBegin);
+                    plan.setExpectedStartDate(expectedStartDate);
+                }
+                if (expectedEndTimeEnd != null) {
+                    String expectedEndDate = DateUtil.TimeStamp2LocalDateStr(expectedEndTimeEnd);
+                    plan.setExpectedEndDate(expectedEndDate);
+                }
+            }
+        }
     }
 
 }

@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 16:42:46
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-28 20:44:54
+ * @LastEditTime: 2021-05-06 09:44:58
  */
 package com.swithun.backend.service;
 
@@ -34,11 +34,14 @@ import com.swithun.backend.entity.PlanTypeEntity;
 import com.swithun.backend.entity.SubTaskEntity;
 import com.swithun.backend.entity.TrackEntity;
 import com.swithun.backend.entity.UnfinishedPlanEntity;
+import com.swithun.backend.utils.ClassConvert;
 import com.swithun.backend.utils.DateUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import ch.qos.logback.core.pattern.Converter;
 
 @Service
 public class PlanService {
@@ -56,6 +59,8 @@ public class PlanService {
   private subTaskRepository subTaskR;
   @Autowired
   private TrackRepository trackR;
+  @Autowired
+  private ClassConvert conveter;
 
   /**
    * @description: 获取本周计划
@@ -166,10 +171,17 @@ public class PlanService {
    * @param {*}
    * @return {*}
    */
-  public void addPlan(PlanEntity planEntity) {
+  public void addPlan(PlanEntity plan) {
+
+    // 0. 完善plan
+    conveter.completeAddPlan(plan);
+    System.out.println("addPlan " + plan.getExpectedStartDate());
+
+    // 1. 保存 plan
+    planR.save(plan);
+    // 2. 在 未完成计划中登记
     UnfinishedPlanEntity unfinishedPlanEntity = new UnfinishedPlanEntity();
-    unfinishedPlanEntity.setPlanByPlanId(planEntity);
-    planR.save(planEntity);
+    unfinishedPlanEntity.setPlanByPlanId(plan);
     ufPlanR.save(unfinishedPlanEntity);
   }
 
