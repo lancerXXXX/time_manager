@@ -5,26 +5,36 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-29 15:43:09
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-30 16:47:54
+ * @LastEditTime: 2021-05-10 13:50:36
  */
 package com.swithun.backend.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import com.swithun.backend.DTO.AddStatisticTemplateDTO;
 import com.swithun.backend.DTO.StDevotionDTO;
 import com.swithun.backend.DTO.StSatisfactionDTO;
 import com.swithun.backend.DTO.StTimeDTO;
 import com.swithun.backend.DTO.StTypeDTO;
+import com.swithun.backend.dao.FinishedTaskRecordRepository;
 import com.swithun.backend.dao.StDevotionRepository;
 import com.swithun.backend.dao.StNameRepository;
 import com.swithun.backend.dao.StSatisfactionRepository;
 import com.swithun.backend.dao.StTimeRepository;
 import com.swithun.backend.dao.StTypeRepository;
 import com.swithun.backend.dao.StatisticTemplateRepository;
+import com.swithun.backend.entity.FinishedTaskRecordEntity;
 import com.swithun.backend.entity.StDevotionEntity;
 import com.swithun.backend.entity.StNameEntity;
 import com.swithun.backend.entity.StSatisfactionEntity;
@@ -33,7 +43,10 @@ import com.swithun.backend.entity.StTypeEntity;
 import com.swithun.backend.entity.StatisticTemplateEntity;
 import com.swithun.backend.utils.ClassConvert;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -51,6 +64,10 @@ public class StatisticService {
     private StSatisfactionRepository stSatisfactionR;
     @Autowired
     private StatisticTemplateRepository stR;
+    @Autowired
+    private FinishedTaskRecordRepository fTaskRecordR;
+
+    Logger logger = LoggerFactory.getLogger(StatisticService.class);
 
     @Autowired
     private ClassConvert convert;
@@ -202,6 +219,152 @@ public class StatisticService {
 
     public void removeSt(Integer id) {
         stR.deleteById(id);
+    }
+
+    public List<FinishedTaskRecordEntity> getFilteredDataBySTId(Integer id) {
+        StatisticTemplateEntity st = stR.findById(id).get();
+        return doGetFilterdData(st);
+    }
+
+    private List<FinishedTaskRecordEntity> doGetFilterdData(StatisticTemplateEntity st) {
+
+        Collection<StDevotionEntity> devotions = st.getStDevotionsById();
+        Collection<StNameEntity> names = st.getStNamesById();
+        Collection<StTypeEntity> types = st.getStTypesById();
+        Collection<StSatisfactionEntity> satisfactions = st.getStSatisfactionsById();
+
+        List<FinishedTaskRecordEntity> allRecord = fTaskRecordR.findAll(new Specification<FinishedTaskRecordEntity>() {
+
+            @Override
+            public Predicate toPredicate(Root<FinishedTaskRecordEntity> root, CriteriaQuery<?> query,
+                    CriteriaBuilder criteriaBuilder) {
+
+                // 1. 获取 计划
+                Join<Object, Object> joinPlan = root.join("planByPlanId");
+                // 2. 获取 计划 属性
+                // 2.1 获取 投入度
+                Path<Object> devotionPath = joinPlan.get("devotion");
+                // 2.2 获取 计划名称
+                Path<Object> namePath = joinPlan.get("planName");
+                // 2.3 获取 计划类型
+                Join<Object, Object> joinPlanJoinPlanType = joinPlan.join("planTypeByPlanType");
+                Path<Object> typeIdPath = joinPlanJoinPlanType.get("id");
+                // 2.4 获取 满意度
+                Path<Object> satisfactionPath = joinPlan.get("satisfaction");
+
+                Predicate pdcDevotions = null;
+                Predicate pcdNames = null;
+                Predicate pcdTypes = null;
+                Predicate pdcSatisfaction = null;
+
+                // 3. 过滤
+                // 3.1 过滤投入度
+                for (StDevotionEntity dvt : devotions) {
+                    Integer level = dvt.getLevel();
+                    Integer operator = dvt.getOperator();
+
+                    Predicate newPredication = null;
+
+                    logger.warn("level " + level);
+                    logger.warn("operator " + operator);
+
+                    if (operator == 0) {
+                        newPredication = criteriaBuilder.greaterThan(devotionPath.as(Integer.class), level);
+                    }
+                    if (operator == 1) {
+                        newPredication = criteriaBuilder.lessThan(devotionPath.as(Integer.class), level);
+                    }
+                    if (operator == 2) {
+                        newPredication = criteriaBuilder.equal(devotionPath.as(Integer.class), level);
+                    }
+                    if (operator == 3) {
+                        newPredication = criteriaBuilder.notEqual(devotionPath.as(Integer.class), level);
+                    }
+                    if (operator == 4) {
+                        newPredication = criteriaBuilder.greaterThanOrEqualTo(devotionPath.as(Integer.class), level);
+                    }
+                    if (operator == 5) {
+                        newPredication = criteriaBuilder.lessThanOrEqualTo(devotionPath.as(Integer.class), level);
+                    }
+                    if (pdcDevotions == null) {
+                        pdcDevotions = newPredication;
+                    } else {
+                        pdcDevotions = criteriaBuilder.and(pdcDevotions, newPredication);
+                    }
+                }
+                // 3.2 过滤计划名称
+                for (StNameEntity name : names) {
+                    logger.warn("name " + name);
+                    Predicate newPredication = criteriaBuilder.like(namePath.as(String.class),
+                            "%" + name.getName() + "%");
+                    if (pcdNames == null) {
+                        pcdNames = newPredication;
+                    } else {
+                        pcdNames = criteriaBuilder.or(pcdNames, newPredication);
+                    }
+                }
+                // 3.3 过滤计划种类
+                for (StTypeEntity type : types) {
+                    Boolean notType = type.getNotType();
+                    Integer typeId = type.getPlanType();
+                    logger.warn("notType " + notType);
+                    logger.warn("typeId " + typeId);
+                    Predicate newPredication = null;
+                    if (!notType) {
+                        newPredication = criteriaBuilder.equal(typeIdPath.as(Integer.class), typeId);
+                    } else {
+                        newPredication = criteriaBuilder.notEqual(typeIdPath.as(Integer.class), typeId);
+                    }
+
+                    if (pcdTypes == null) {
+                        pcdTypes = newPredication;
+                    } else {
+                        pcdTypes = criteriaBuilder.or(pcdTypes, newPredication);
+                    }
+                }
+
+                // 3.4 过滤 满意度
+                for (StSatisfactionEntity stf : satisfactions) {
+                    Integer level = stf.getLevel();
+                    Integer operator = stf.getOperator();
+
+                    Predicate newPredication = null;
+
+                    logger.warn("level " + level);
+                    logger.warn("operator " + operator);
+
+                    if (operator == 0) {
+                        newPredication = criteriaBuilder.greaterThan(satisfactionPath.as(Integer.class), level);
+                    }
+                    if (operator == 1) {
+                        newPredication = criteriaBuilder.lessThan(satisfactionPath.as(Integer.class), level);
+                    }
+                    if (operator == 2) {
+                        newPredication = criteriaBuilder.equal(satisfactionPath.as(Integer.class), level);
+                    }
+                    if (operator == 3) {
+                        newPredication = criteriaBuilder.notEqual(satisfactionPath.as(Integer.class), level);
+                    }
+                    if (operator == 4) {
+                        newPredication = criteriaBuilder.greaterThanOrEqualTo(satisfactionPath.as(Integer.class),
+                                level);
+                    }
+                    if (operator == 5) {
+                        newPredication = criteriaBuilder.lessThanOrEqualTo(satisfactionPath.as(Integer.class), level);
+                    }
+                    if (pdcSatisfaction == null) {
+                        pdcSatisfaction = newPredication;
+                    } else {
+                        pdcSatisfaction = criteriaBuilder.and(pdcSatisfaction, newPredication);
+                    }
+
+                }
+
+                return criteriaBuilder.and(pdcDevotions, pcdNames, pcdTypes, pdcSatisfaction);
+            }
+
+        });
+        return allRecord;
     }
 
 }

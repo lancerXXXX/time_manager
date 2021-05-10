@@ -5,13 +5,14 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 16:42:46
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-06 16:04:02
+ * @LastEditTime: 2021-05-10 09:18:00
  */
 package com.swithun.backend.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -172,47 +173,57 @@ public class PlanService {
     List<UnfinishedPlanEntity> ufPlans = gettaskbydate(date);
 
     Map<String, Object> mp = new ConcurrentHashMap<>();
-    List<PlanEntity> orderLimitedPlans = new ArrayList<>();
-    List<PlanEntity> timeLimitedPlans = new ArrayList<>();
+    List<PlanEntity> oPlans = new ArrayList<>();
+    List<PlanEntity> tPlans = new ArrayList<>();
 
-    Set<Integer> orderLimitedPlanIdSet = new HashSet<>();
+    Set<Integer> checkPlanIds = new HashSet<>();
     // 1. 处理 时间限制 计划
     for (UnfinishedPlanEntity ufPlan : ufPlans) {
       PlanEntity plan = ufPlan.getPlanByPlanId();
-      if (plan.getExpectedStartDate() != null) { // 如果有时间
-        timeLimitedPlans.add(plan);
-        orderLimitedPlanIdSet.add(plan.getId());
-        orderLimitedPlans.add(plan);
+      if (!isOrderLimitedPlan(plan)) { // 如果有时间限制
+        tPlans.add(plan);
+        checkPlanIds.add(plan.getId());
       }
     }
-    mp.put("timeLimitedPlanSet", timeLimitedPlans);
+    mp.put("timeLimitedPlanSet", tPlans);
     // 2. 处理顺序限制 邻接表
     List<RelationEntity> allRelation = relationR.findAll();// 获取所有 relation
-    Map<String, Set<Integer>> piles = new ConcurrentHashMap<>();
-    Set<Integer> checkedOrderId = new HashSet<>();
+    Map<String, Set<String>> piles = new ConcurrentHashMap<>();
+    Set<Integer> checkedRelation = new HashSet<>();
     boolean notFinish = false;
     do {
       notFinish = false;
       for (RelationEntity relation : allRelation) {
-        if (!checkedOrderId.contains(relation.getId())) {
+        if (!checkedRelation.contains(relation.getId())) {
+
           Integer pre = relation.getPlanByPrePlanId().getId();
           Integer back = relation.getPlanByPlanId().getId();
-          String pre_str = String.valueOf(pre);
-          if (orderLimitedPlanIdSet.contains(pre) || orderLimitedPlanIdSet.contains(back)) {
+
+          String pre_str = (isOrderLimitedPlan(relation.getPlanByPrePlanId()) ? "o" : "t") + String.valueOf(pre);
+          String back_str = (isOrderLimitedPlan(relation.getPlanByPlanId()) ? "o" : "t") + String.valueOf(back);
+
+          if (checkPlanIds.contains(pre) || checkPlanIds.contains(back)) {
+
             notFinish = true;
-            checkedOrderId.add(relation.getId());
-            if (!orderLimitedPlanIdSet.contains(pre)) {
-              orderLimitedPlanIdSet.add(pre);
-              orderLimitedPlans.add(relation.getPlanByPrePlanId());
+
+            checkedRelation.add(relation.getId());
+
+            if (!checkPlanIds.contains(pre)) {
+              checkPlanIds.add(pre);
+              if (isOrderLimitedPlan(relation.getPlanByPrePlanId())) {
+                oPlans.add(relation.getPlanByPrePlanId()); // 添加 顺序限制 Plan
+              }
             }
-            if (!orderLimitedPlanIdSet.contains(back)) {
-              orderLimitedPlanIdSet.add(back);
-              orderLimitedPlans.add(relation.getPlanByPlanId());
+            if (!checkPlanIds.contains(back)) {
+              checkPlanIds.add(back);
+              if (isOrderLimitedPlan(relation.getPlanByPlanId())) {
+                oPlans.add(relation.getPlanByPlanId()); // 添加 顺序限制 Plan
+              }
             }
             if (!piles.containsKey(pre_str)) {
-              piles.put(pre_str, new HashSet<>());
+              piles.put(pre_str, new HashSet<>()); // 添加 桩
             }
-            piles.get(pre_str).add(back);
+            piles.get(pre_str).add(back_str); // 给 桩 添加数据
           }
         }
       }
@@ -222,9 +233,14 @@ public class PlanService {
 
     // 3. 处理顺序限制 plan
 
-    mp.put("orderLimitedPlanSet", orderLimitedPlans);
+    mp.put("orderLimitedPlanSet", oPlans);
 
     return mp;
+  }
+
+  public boolean isOrderLimitedPlan(PlanEntity plan) {
+    return plan.getExpectedStartTimeBegin() == null && plan.getExpectedStartTimeEnd() == null
+        && plan.getExpectedEndTimeBegin() == null && plan.getExpectedEndTimeEnd() == null;
   }
 
   /**
@@ -241,7 +257,7 @@ public class PlanService {
    * @param {*}
    * @return {*}
    */
-  public void addPlan(PlanEntity plan) {
+  public Integer addPlan(PlanEntity plan) {
 
     // 0. 完善plan
     conveter.completeAddPlan(plan);
@@ -252,11 +268,12 @@ public class PlanService {
       subTask.setPlanByParentPlan(plan);
     }
     // 2. 保存 plan
-    planR.save(plan);
+    PlanEntity savedPlan = planR.save(plan);
     // 3. 在 未完成计划中登记
     UnfinishedPlanEntity unfinishedPlanEntity = new UnfinishedPlanEntity();
     unfinishedPlanEntity.setPlanByPlanId(plan);
     ufPlanR.save(unfinishedPlanEntity);
+    return savedPlan.getId();
   }
 
   public void finishPlanByOnce(FinishedTaskRecordEntity finishedTaskRecordEntity) {
@@ -353,7 +370,7 @@ public class PlanService {
   }
 
   public void deleteRelation(Map<String, Object> mp) {
-    List<Integer> relation = (List<Integer>)mp.get("relation");
+    List<Integer> relation = (List<Integer>) mp.get("relation");
     PlanEntity plan = new PlanEntity();
     plan.setId(relation.get(0));
     PlanEntity prePlan = new PlanEntity();
@@ -361,13 +378,59 @@ public class PlanService {
     relationR.deleteAllByPlanByPlanIdAndPlanByPrePlanId(plan, prePlan);
   }
 
-  public void deletePlan(PlanEntity plan) {
+  public Map<String, Set<String>> deletePlan(PlanEntity plan) {
+
+    Map<String, Set<String>> mp = new HashMap<>();
+
+    Set<String> rs = new HashSet<>();
+    Set<String> oPlans = new HashSet<>();
+
+    List<RelationEntity> delRelations = relationR.findAllByPlanByPlanIdOrPlanByPrePlanId(plan, plan);
+
+    for (RelationEntity relation : delRelations) {
+      PlanEntity backPlan = relation.getPlanByPlanId();
+      PlanEntity prePlan = relation.getPlanByPrePlanId();
+
+      String backPlan_str = null;
+      String prePlan_str = null;
+
+      if (isOrderLimitedPlan(backPlan)) {
+        backPlan_str = "o" + String.valueOf(backPlan.getId());
+        if (backPlan.getId() != plan.getId())
+          oPlans.add(backPlan_str);
+      }
+      if (isOrderLimitedPlan(prePlan)) {
+        prePlan_str = "o" + String.valueOf(prePlan.getId());
+        if (prePlan.getId() != plan.getId())
+          oPlans.add(prePlan_str);
+      }
+      rs.add("r" + prePlan_str + "-" + backPlan_str);
+
+    }
+
+    mp.put("relations", rs);
+    mp.put("plans", oPlans);
+
     plan = planR.findById(plan.getId()).get();
+
     System.out.println("plan ID " + plan.getId());
+
     List<UnfinishedPlanEntity> ufPlans = new ArrayList<>(plan.getUnfinishedPlansById());
+
     plan.getUnfinishedPlansById().removeAll(ufPlans);
+
     ufPlanR.deleteAll(ufPlans);
     planR.delete(plan);
+
+    return mp;
+
+  }
+
+  public void updatePlanPos(Map<String, Object> mp) {
+    PlanEntity plan = planR.findOneById((Integer) mp.get("id"));
+    plan.setX((Integer)mp.get("x"));
+    plan.setY((Integer)mp.get("y"));
+    planR.save(plan);
   }
 
 }

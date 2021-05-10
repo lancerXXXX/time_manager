@@ -1,3 +1,12 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @@Company: None
+ * @Author: Swithun Liu
+ * @Date: 2021-05-05 21:15:43
+ * @LastEditors: Swithun Liu
+ * @LastEditTime: 2021-05-10 09:29:47
+ */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
@@ -10,6 +19,14 @@ import java.util.Objects;
 @Table(name = "stDevotion", schema = "time_manger", catalog = "")
 public class StDevotionEntity {
     private Integer id;
+    /**
+     * MORE: '>', 
+     * LESS: '<', 
+     * EQ: '=', 
+     * NEQ: '!=', 
+     * MEQ: '>=', 
+     * LEQ: '<='
+     */
     private Integer operator;
     private Integer level;
     @JsonIgnore
@@ -48,10 +65,13 @@ public class StDevotionEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         StDevotionEntity that = (StDevotionEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(operator, that.operator) && Objects.equals(level, that.level);
+        return Objects.equals(id, that.id) && Objects.equals(operator, that.operator)
+                && Objects.equals(level, that.level);
     }
 
     @Override

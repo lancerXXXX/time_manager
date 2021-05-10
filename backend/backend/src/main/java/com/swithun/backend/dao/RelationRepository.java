@@ -9,6 +9,8 @@
  */
 package com.swithun.backend.dao;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import com.swithun.backend.entity.PlanEntity;
@@ -22,6 +24,7 @@ public interface RelationRepository extends JpaRepository<RelationEntity, Intege
     @Transactional
     public void deleteAllByPlanByPlanIdAndPlanByPrePlanId(PlanEntity plan, PlanEntity prePlan);
     public RelationEntity findAllByPlanByPlanIdAndPlanByPrePlanId(PlanEntity plan, PlanEntity prePlan);
+    public List<RelationEntity> findAllByPlanByPlanIdOrPlanByPrePlanId(PlanEntity plan, PlanEntity plan2);
 }
 /*
  * @Descripttion: 

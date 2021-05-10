@@ -38,6 +38,7 @@ public class PlanEntity {
     private Integer y;
     private Integer devotion;
     private Integer satisfaction;
+    private Integer expectedTime;
     private Integer time;
     private String note;
     @JsonIgnore
@@ -46,7 +47,7 @@ public class PlanEntity {
     private Collection<UnfinishedPlanEntity> unfinishedPlansById;
     @JsonIgnore
     private Collection<FinishedPlanEntity> finishedPlansById;
-    @JsonProperty("type")
+    @JsonProperty("taskType")
     private PlanTypeEntity planTypeByPlanType;
     // @JsonIgnore
     @JsonProperty("subTasks")
@@ -65,6 +66,17 @@ public class PlanEntity {
     public Integer getId() {
         return id;
     }
+
+    @Basic
+    @Column(name = "expected_time")
+    public Integer getExpectedTime() {
+        return expectedTime;
+    }
+
+    public void setExpectedTime(Integer expectedTime) {
+        this.expectedTime = expectedTime;
+    }
+
 
     @Basic
     @Column(name = "expected_start_time_begin")

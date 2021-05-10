@@ -1,3 +1,12 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @@Company: None
+ * @Author: Swithun Liu
+ * @Date: 2021-05-05 21:15:43
+ * @LastEditors: Swithun Liu
+ * @LastEditTime: 2021-05-10 10:03:04
+ */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;

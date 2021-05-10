@@ -5,13 +5,16 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-29 15:26:40
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-30 10:00:34
+ * @LastEditTime: 2021-05-10 09:47:22
  */
 package com.swithun.backend.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import com.swithun.backend.DTO.AddStatisticTemplateDTO;
+import com.swithun.backend.dao.FinishedTaskRecordRepository;
+import com.swithun.backend.entity.FinishedTaskRecordEntity;
 import com.swithun.backend.service.StatisticService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,9 @@ public class StatisticController {
 
     @Autowired
     private StatisticService statisticS;
+
+    @Autowired
+    private FinishedTaskRecordRepository fTaskRecordR;
     
     @PostMapping(value="/statistic/add")
     public Integer addStatisticTemplate(@RequestBody AddStatisticTemplateDTO dto) {
@@ -55,6 +61,10 @@ public class StatisticController {
         return "更新成功";
     }
     
+    @GetMapping(value="/statistic/getFilteredDataBySTId")
+    public List<FinishedTaskRecordEntity> getFilteredDataBySTId(@RequestParam Integer id) {
+        return statisticS.getFilteredDataBySTId(id);
+    }
     
     
 }

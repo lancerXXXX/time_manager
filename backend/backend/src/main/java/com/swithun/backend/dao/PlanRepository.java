@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-07 10:25:04
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-12 16:25:03
+ * @LastEditTime: 2021-05-08 09:33:21
  */
 package com.swithun.backend.dao;
 
@@ -51,4 +51,5 @@ public interface PlanRepository extends JpaRepository<PlanEntity, Integer>{
      * @return {*}
      */
     List<PlanEntity> findByRepeatType(Integer repeatType);
+    PlanEntity findOneById(Integer integer);
 }
