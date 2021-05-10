@@ -5,11 +5,12 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-30 15:03:48
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-06 13:48:10
+ * @LastEditTime: 2021-05-10 14:56:16
  */
 package com.swithun.backend.utils;
 
 import com.swithun.backend.entity.PlanEntity;
+import com.swithun.backend.entity.PlanTypeEntity;
 import com.swithun.backend.entity.StDevotionEntity;
 import com.swithun.backend.entity.StNameEntity;
 import com.swithun.backend.entity.StSatisfactionEntity;
@@ -162,5 +163,16 @@ public class ClassConvert {
         }
     }
 
+    public ArrayList<Integer> getTypeList(PlanEntity plan) {
+
+        ArrayList<Integer> res = new ArrayList<>();
+        
+        PlanTypeEntity currentPlanType = plan.getPlanTypeByPlanType();
+        while (currentPlanType != null) {
+            res.add(currentPlanType.getId());
+            currentPlanType = currentPlanType.getPlanTypeByParentId();
+        }
+        return res;
+    }
 
 }

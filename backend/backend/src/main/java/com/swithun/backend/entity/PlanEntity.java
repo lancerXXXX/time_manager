@@ -5,12 +5,37 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(name = "plan", schema = "time_manger", catalog = "")
 public class PlanEntity {
+
+    @Transient
+    public List<Integer> getTypeList() {
+        return typeList;
+    }
+
+    public void setTypeList(ArrayList<Integer> typeList) {
+        this.typeList = typeList;
+    }
+
+    @Basic
+    @Column(name = "priority")
+    // 0 no
+    // 1 low
+    // 2 medium
+    // 3 high
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
 
     public PlanEntity() {
     }
@@ -38,16 +63,17 @@ public class PlanEntity {
     private Integer y;
     private Integer devotion;
     private Integer satisfaction;
+    private Integer priority;
     private Integer expectedTime;
     private Integer time;
     private String note;
+    private ArrayList<Integer> typeList;
     @JsonIgnore
     private Collection<FinishedTaskRecordEntity> finishedTaskRecordsById;
     @JsonIgnore
     private Collection<UnfinishedPlanEntity> unfinishedPlansById;
     @JsonIgnore
     private Collection<FinishedPlanEntity> finishedPlansById;
-    @JsonProperty("taskType")
     private PlanTypeEntity planTypeByPlanType;
     // @JsonIgnore
     @JsonProperty("subTasks")

@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 16:42:46
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-10 09:18:00
+ * @LastEditTime: 2021-05-10 15:04:47
  */
 package com.swithun.backend.service;
 
@@ -168,7 +168,7 @@ public class PlanService {
 
   }
 
-  public Map<String, Object> dealWithGetAllPlan(String date) {
+  public Map<String, Object> dealWithGetAllLimitedPlan(String date) {
     // 0 获取所有这一天的任务(确定时间的 任务)
     List<UnfinishedPlanEntity> ufPlans = gettaskbydate(date);
 
@@ -180,7 +180,8 @@ public class PlanService {
     // 1. 处理 时间限制 计划
     for (UnfinishedPlanEntity ufPlan : ufPlans) {
       PlanEntity plan = ufPlan.getPlanByPlanId();
-      if (!isOrderLimitedPlan(plan)) { // 如果有时间限制
+      if (getPlanType(plan) == 0) { // 如果有时间限制
+        plan.setTypeList(conveter.getTypeList(plan));
         tPlans.add(plan);
         checkPlanIds.add(plan.getId());
       }
@@ -199,10 +200,10 @@ public class PlanService {
           Integer pre = relation.getPlanByPrePlanId().getId();
           Integer back = relation.getPlanByPlanId().getId();
 
-          String pre_str = (isOrderLimitedPlan(relation.getPlanByPrePlanId()) ? "o" : "t") + String.valueOf(pre);
-          String back_str = (isOrderLimitedPlan(relation.getPlanByPlanId()) ? "o" : "t") + String.valueOf(back);
-
           if (checkPlanIds.contains(pre) || checkPlanIds.contains(back)) {
+
+            String pre_str = (getPlanType(relation.getPlanByPrePlanId()) == 1 ? "o" : "t") + String.valueOf(pre);
+            String back_str = (getPlanType(relation.getPlanByPlanId()) == 1 ? "o" : "t") + String.valueOf(back);
 
             notFinish = true;
 
@@ -210,14 +211,18 @@ public class PlanService {
 
             if (!checkPlanIds.contains(pre)) {
               checkPlanIds.add(pre);
-              if (isOrderLimitedPlan(relation.getPlanByPrePlanId())) {
-                oPlans.add(relation.getPlanByPrePlanId()); // 添加 顺序限制 Plan
+              if (getPlanType(relation.getPlanByPrePlanId()) == 1) {
+                PlanEntity plan = relation.getPlanByPrePlanId();
+                plan.setTypeList(conveter.getTypeList(plan));
+                oPlans.add(plan); // 添加 顺序限制 Plan
               }
             }
             if (!checkPlanIds.contains(back)) {
               checkPlanIds.add(back);
-              if (isOrderLimitedPlan(relation.getPlanByPlanId())) {
-                oPlans.add(relation.getPlanByPlanId()); // 添加 顺序限制 Plan
+              if (getPlanType(relation.getPlanByPlanId()) == 1) {
+                PlanEntity plan = relation.getPlanByPlanId();
+                plan.setTypeList(conveter.getTypeList(plan));
+                oPlans.add(plan); // 添加 顺序限制 Plan
               }
             }
             if (!piles.containsKey(pre_str)) {
@@ -238,9 +243,48 @@ public class PlanService {
     return mp;
   }
 
-  public boolean isOrderLimitedPlan(PlanEntity plan) {
-    return plan.getExpectedStartTimeBegin() == null && plan.getExpectedStartTimeEnd() == null
-        && plan.getExpectedEndTimeBegin() == null && plan.getExpectedEndTimeEnd() == null;
+  public Map<String, Object> getAllUnlimitedPlan() {
+    Map<String, Object> mp = new HashMap<>();
+
+    List<UnfinishedPlanEntity> ufPlans = ufPlanR.findAll();
+    List<PlanEntity> noPlans = new ArrayList<>();
+    List<PlanEntity> lowPlans = new ArrayList<>();
+    List<PlanEntity> mediumPlans = new ArrayList<>();
+    List<PlanEntity> hightPlans = new ArrayList<>();
+    for (UnfinishedPlanEntity ufPlan : ufPlans) {
+      PlanEntity plan = ufPlan.getPlanByPlanId();
+      plan.setTypeList(conveter.getTypeList(plan));
+      if (getPlanType(plan) == 2) {
+        Integer prot = plan.getPriority();
+        if (prot == null) {
+          noPlans.add(plan);
+        } else if (prot == 1) {
+          lowPlans.add(plan);
+        } else if (prot == 2) {
+          mediumPlans.add(plan);
+        } else if (prot == 3) {
+          hightPlans.add(plan);
+        }
+      }
+    }
+    mp.put("no", noPlans);
+    mp.put("low", lowPlans);
+    mp.put("medium", mediumPlans);
+    mp.put("high", hightPlans);
+    return mp;
+  }
+
+  public Integer getPlanType(PlanEntity plan) {
+    if (plan.getExpectedStartTimeBegin() == null && plan.getExpectedStartTimeEnd() == null
+        && plan.getExpectedEndTimeBegin() == null && plan.getExpectedEndTimeEnd() == null) {
+      if (plan.getX() != null) {
+        return 1;// 顺序限制计划
+      } else {
+        return 2; // 无限制计划
+      }
+    } else {
+      return 0;// 时间限制计划
+    }
   }
 
   /**
@@ -394,12 +438,12 @@ public class PlanService {
       String backPlan_str = null;
       String prePlan_str = null;
 
-      if (isOrderLimitedPlan(backPlan)) {
+      if (getPlanType(backPlan) == 1) {
         backPlan_str = "o" + String.valueOf(backPlan.getId());
         if (backPlan.getId() != plan.getId())
           oPlans.add(backPlan_str);
       }
-      if (isOrderLimitedPlan(prePlan)) {
+      if (getPlanType(prePlan) == 1) {
         prePlan_str = "o" + String.valueOf(prePlan.getId());
         if (prePlan.getId() != plan.getId())
           oPlans.add(prePlan_str);
@@ -428,8 +472,8 @@ public class PlanService {
 
   public void updatePlanPos(Map<String, Object> mp) {
     PlanEntity plan = planR.findOneById((Integer) mp.get("id"));
-    plan.setX((Integer)mp.get("x"));
-    plan.setY((Integer)mp.get("y"));
+    plan.setX((Integer) mp.get("x"));
+    plan.setY((Integer) mp.get("y"));
     planR.save(plan);
   }
 

@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-20 14:58:49
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-08 16:57:03
+ * @LastEditTime: 2021-05-10 14:20:00
  */
 
 package com.swithun.backend.controller;
@@ -75,37 +75,41 @@ public class planController {
         return planS.addPlan(plan);
     }
 
-    @PostMapping(value="/plan/updatePlanPos")
+    @PostMapping(value = "/plan/updatePlanPos")
     public void updatePlanPos(@RequestBody Map<String, Object> mp) {
         planS.updatePlanPos(mp);
     }
-    
 
-    @PostMapping(value="/plan/addRelation")
+    @PostMapping(value = "/plan/addRelation")
     public void addRelation(@RequestBody Map<String, Object> mp) {
         List<Integer> relation = (List<Integer>) mp.get("relation");
         planS.addRelation(relation.get(0), relation.get(1));
     }
 
-    @GetMapping(value = "/plan/getPlanByDate")
-    public Map<String, Object> getPlanByDate(@RequestParam String date) {
+    @GetMapping(value = "/plan/limited/getPlanByDate")
+    public Map<String, Object> getLimitedPlanByDate(@RequestParam String date) {
         String dateStr = DateUtil.TimeStamp2LocalDateStr(date);
-        return planS.dealWithGetAllPlan(dateStr);
+        return planS.dealWithGetAllLimitedPlan(dateStr);
     }
 
-    @PostMapping(value="/plan/relation/updateRelation")
-    public void updateRelation(@RequestBody Map<String,Object> mp) {
+    @GetMapping(value = "/plan/unlimited/getAllPlan")
+    public Map<String, Object> getAllUnlimitedPlan() {
+        return planS.getAllUnlimitedPlan();
+    }
+
+    @PostMapping(value = "/plan/relation/updateRelation")
+    public void updateRelation(@RequestBody Map<String, Object> mp) {
         planS.updateRelation(mp);
     }
 
-    @PostMapping(value="/plan/removePlan")
+    @PostMapping(value = "/plan/removePlan")
     public Map<String, Set<String>> deletePlan(@RequestBody PlanEntity plan) {
         return planS.deletePlan(plan);
     }
-    @PostMapping(value="/plan/relation/delete")
+
+    @PostMapping(value = "/plan/relation/delete")
     public void deleteRelation(@RequestBody Map<String, Object> mp) {
         planS.deleteRelation(mp);
     }
-    
 
 }
