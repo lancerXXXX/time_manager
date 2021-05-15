@@ -74,6 +74,7 @@ public class PlanEntity {
     private Collection<UnfinishedPlanEntity> unfinishedPlansById;
     @JsonIgnore
     private Collection<FinishedPlanEntity> finishedPlansById;
+    @JsonProperty("taskType")
     private PlanTypeEntity planTypeByPlanType;
     // @JsonIgnore
     @JsonProperty("subTasks")

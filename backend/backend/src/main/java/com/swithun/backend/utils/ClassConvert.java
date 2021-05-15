@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-30 15:03:48
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-10 14:56:16
+ * @LastEditTime: 2021-05-11 17:03:36
  */
 package com.swithun.backend.utils;
 
@@ -174,5 +174,17 @@ public class ClassConvert {
         }
         return res;
     }
+
+    public ArrayList<Integer> getTypeListByPlanType(PlanTypeEntity currentPlanType) {
+
+        ArrayList<Integer> res = new ArrayList<>();
+        
+        while (currentPlanType != null) {
+            res.add(currentPlanType.getId());
+            currentPlanType = currentPlanType.getPlanTypeByParentId();
+        }
+        return res;
+    }
+    
 
 }

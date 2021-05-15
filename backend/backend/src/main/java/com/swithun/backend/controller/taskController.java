@@ -45,15 +45,6 @@ public class taskController {
     @Autowired
     private ClassConvert converter;
 
-    /**
-     * @description: 获取本周计划
-     * @param {String date} date = "" 则默认取当日
-     * @return {List<PlanEntity>}
-     */
-    @GetMapping(value = "/plan/getweekplan")
-    public List<UnfinishedPlanEntity> getWeekPlan(@RequestParam String date) {
-        return planS.getWeekPlan(date);
-    }
 
     /**
      * @description: 获取所有未完成计划

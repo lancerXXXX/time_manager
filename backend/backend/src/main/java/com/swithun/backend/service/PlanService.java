@@ -5,13 +5,12 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 16:42:46
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-10 15:04:47
+ * @LastEditTime: 2021-05-14 10:44:37
  */
 package com.swithun.backend.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,11 +45,11 @@ import com.swithun.backend.entity.UnfinishedPlanEntity;
 import com.swithun.backend.utils.ClassConvert;
 import com.swithun.backend.utils.DateUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import ch.qos.logback.core.pattern.Converter;
 
 @Service
 public class PlanService {
@@ -73,13 +72,18 @@ public class PlanService {
   @Autowired
   private ClassConvert conveter;
 
+  Logger logger = LoggerFactory.getLogger(PlanService.class);
+
   /**
    * @description: 获取本周计划
    * @param {String date} date = "" 则默认取当日
    * @return {List<UnfinishedPlanEntity>}
    */
-  public List<UnfinishedPlanEntity> getWeekPlan(String date) {
-    LocalDate now = date == "" ? LocalDate.now() : LocalDate.parse(date);
+  public List<PlanEntity> getDatePlan(String date) {
+
+    List<PlanEntity> ans = new ArrayList<>();
+
+    LocalDate now = (date == "" ? LocalDate.now() : DateUtil.TimeStamp2LocalDate(date));
 
     String strs[] = DateUtil.parsePreNext(now);
 
@@ -96,6 +100,12 @@ public class PlanService {
         Path<Object> repeatTypePath = join.get("repeatType");
         Path<Object> expectedStartDatePath = join.get("expectedStartDate");
         Path<Object> expectedEndDatePath = join.get("expectedEndDate");
+
+        Path<Object> expectedStartTimeBegin = join.get("expectedStartTimeBegin");
+        Path<Object> expectedStartTimeEnd = join.get("expectedStartTimeEnd");
+        Path<Object> expectedEndTimeBegin = join.get("expectedEndTimeBegin");
+        Path<Object> expectedEndTimeEnd = join.get("expectedEndTimeEnd");
+
         // 非重复计划
         Predicate predicate0 = criteriaBuilder.equal(repeatTypePath, 0);
         Predicate predicate0Date = criteriaBuilder.or(
@@ -119,10 +129,24 @@ public class PlanService {
             criteriaBuilder.between(expectedEndDatePath.as(String.class), strs[2], strs[3]));
         Predicate type3 = criteriaBuilder.and(predicate3, predicate3Date);
 
-        return criteriaBuilder.or(type0, type1, type2, type3);
+        Predicate tipSB = criteriaBuilder.isNull(expectedStartTimeBegin);
+        Predicate tipSE = criteriaBuilder.isNull(expectedStartTimeEnd);
+        Predicate tipEB = criteriaBuilder.isNull(expectedEndTimeBegin);
+        Predicate tipEE = criteriaBuilder.isNull(expectedEndTimeEnd);
+
+        Predicate tip = criteriaBuilder.and(tipSB, tipSE, tipEB, tipEE);
+
+        Predicate type = criteriaBuilder.or(type0, type1, type2, type3);
+        return criteriaBuilder.and(type, tip);
       }
     });
-    return unfinishedPlanEntities;
+
+    for (UnfinishedPlanEntity ufPlan : unfinishedPlanEntities) {
+      PlanEntity plan = ufPlan.getPlanByPlanId();
+      plan.setTypeList(conveter.getTypeList(plan));
+      ans.add(plan);
+    }
+    return ans;
   }
 
   /**
@@ -180,7 +204,7 @@ public class PlanService {
     // 1. 处理 时间限制 计划
     for (UnfinishedPlanEntity ufPlan : ufPlans) {
       PlanEntity plan = ufPlan.getPlanByPlanId();
-      if (getPlanType(plan) == 0) { // 如果有时间限制
+      if (getPlanType(plan) == 11) { // 如果有时间限制
         plan.setTypeList(conveter.getTypeList(plan));
         tPlans.add(plan);
         checkPlanIds.add(plan.getId());
@@ -202,8 +226,8 @@ public class PlanService {
 
           if (checkPlanIds.contains(pre) || checkPlanIds.contains(back)) {
 
-            String pre_str = (getPlanType(relation.getPlanByPrePlanId()) == 1 ? "o" : "t") + String.valueOf(pre);
-            String back_str = (getPlanType(relation.getPlanByPlanId()) == 1 ? "o" : "t") + String.valueOf(back);
+            String pre_str = (getPlanType(relation.getPlanByPrePlanId()) == 21 ? "o" : "t") + String.valueOf(pre);
+            String back_str = (getPlanType(relation.getPlanByPlanId()) == 21 ? "o" : "t") + String.valueOf(back);
 
             notFinish = true;
 
@@ -211,7 +235,7 @@ public class PlanService {
 
             if (!checkPlanIds.contains(pre)) {
               checkPlanIds.add(pre);
-              if (getPlanType(relation.getPlanByPrePlanId()) == 1) {
+              if (getPlanType(relation.getPlanByPrePlanId()) == 21) {
                 PlanEntity plan = relation.getPlanByPrePlanId();
                 plan.setTypeList(conveter.getTypeList(plan));
                 oPlans.add(plan); // 添加 顺序限制 Plan
@@ -219,7 +243,7 @@ public class PlanService {
             }
             if (!checkPlanIds.contains(back)) {
               checkPlanIds.add(back);
-              if (getPlanType(relation.getPlanByPlanId()) == 1) {
+              if (getPlanType(relation.getPlanByPlanId()) == 21) {
                 PlanEntity plan = relation.getPlanByPlanId();
                 plan.setTypeList(conveter.getTypeList(plan));
                 oPlans.add(plan); // 添加 顺序限制 Plan
@@ -254,7 +278,7 @@ public class PlanService {
     for (UnfinishedPlanEntity ufPlan : ufPlans) {
       PlanEntity plan = ufPlan.getPlanByPlanId();
       plan.setTypeList(conveter.getTypeList(plan));
-      if (getPlanType(plan) == 2) {
+      if (getPlanType(plan) == 22) {
         Integer prot = plan.getPriority();
         if (prot == null) {
           noPlans.add(plan);
@@ -275,16 +299,34 @@ public class PlanService {
   }
 
   public Integer getPlanType(PlanEntity plan) {
-    if (plan.getExpectedStartTimeBegin() == null && plan.getExpectedStartTimeEnd() == null
-        && plan.getExpectedEndTimeBegin() == null && plan.getExpectedEndTimeEnd() == null) {
-      if (plan.getX() != null) {
-        return 1;// 顺序限制计划
+
+    if (plan.getExpectedStartDate() != null || plan.getExpectedEndDate() != null) {
+      if (plan.getExpectedStartTimeBegin() != null
+          || plan.getExpectedStartTimeEnd() != null && plan.getExpectedEndTimeBegin() != null
+          || plan.getExpectedEndTimeEnd() != null) {
+        return 11; // date 确定 time 确定 -> 时间限制计划
       } else {
-        return 2; // 无限制计划
+        return 12; // date 确定 time 不确定 -> 周 月 计划
       }
     } else {
-      return 0;// 时间限制计划
+      if (plan.getX() != null) {
+        return 21; // date 不确定 time 不确定 pos 确定 -> 顺序限制计划
+      } else {
+        return 22; // date 不确定 time 不确定 pos 不确定 -> 无限制计划
+      }
     }
+    // if (plan.getExpectedStartTimeBegin() == null &&
+    // plan.getExpectedStartTimeEnd() == null
+    // && plan.getExpectedEndTimeBegin() == null && plan.getExpectedEndTimeEnd() ==
+    // null) {
+    // if (plan.getX() != null) {
+    // return 1;// 顺序限制计划
+    // } else {
+    // return 2; // 无限制计划
+    // }
+    // } else {
+    // return 0;// 时间限制计划
+    // }
   }
 
   /**
@@ -301,10 +343,18 @@ public class PlanService {
    * @param {*}
    * @return {*}
    */
-  public Integer addPlan(PlanEntity plan) {
+  public Integer addPlan(PlanEntity plan, Boolean isTime) {
 
     // 0. 完善plan
     conveter.completeAddPlan(plan);
+
+    if (!isTime) {
+      plan.setExpectedStartTimeBegin(null);
+      plan.setExpectedStartTimeEnd(null);
+      plan.setExpectedEndTimeBegin(null);
+      plan.setExpectedEndTimeEnd(null);
+    }
+
     System.out.println("addPlan " + plan.getExpectedStartDate());
 
     // 1 将subPlan 的plan设置为 当前plan
@@ -314,9 +364,16 @@ public class PlanService {
     // 2. 保存 plan
     PlanEntity savedPlan = planR.save(plan);
     // 3. 在 未完成计划中登记
-    UnfinishedPlanEntity unfinishedPlanEntity = new UnfinishedPlanEntity();
-    unfinishedPlanEntity.setPlanByPlanId(plan);
-    ufPlanR.save(unfinishedPlanEntity);
+    UnfinishedPlanEntity ufPlan = ufPlanR.findByplanByPlanId(plan);
+
+    // 3.1 如果是更新 (在未完成计划中已经有的) —— 不需要更新 ufPlan
+    // 3.2 如果是添加
+    if (ufPlan == null) {
+      UnfinishedPlanEntity unfinishedPlanEntity = new UnfinishedPlanEntity();
+      unfinishedPlanEntity.setPlanByPlanId(plan);
+      ufPlanR.save(unfinishedPlanEntity);
+    }
+
     return savedPlan.getId();
   }
 
@@ -392,6 +449,12 @@ public class PlanService {
   }
 
   public void updateRelation(Map<String, Object> mp) {
+
+    String date = DateUtil.TimeStamp2LocalDateStr((String) mp.get("date"));
+
+    // 2.2 查询原来有的 顺序限制 计划j
+    List<PlanEntity> oldOplans = (List<PlanEntity>) dealWithGetAllLimitedPlan(date).get("orderLimitedPlanSet");
+
     Integer updateType = (Integer) mp.get("type");
     List<Integer> relation = (List<Integer>) mp.get("relation");
     if (updateType == 0) {
@@ -411,47 +474,113 @@ public class PlanService {
       newRelation.setPlanByPrePlanId(new PlanEntity(relation.get(2)));
       relationR.save(newRelation);
     }
+
+    dealOPlan2NoPlan(oldOplans, date);
   }
 
   public void deleteRelation(Map<String, Object> mp) {
+
+    String date = DateUtil.TimeStamp2LocalDateStr((String) mp.get("date"));
+    logger.info(date);
+
+    // 2.2 查询原来有的 顺序限制 计划j
+    List<PlanEntity> oldOplans = (List<PlanEntity>) dealWithGetAllLimitedPlan(date).get("orderLimitedPlanSet");
+
+    // 1 开始处理
     List<Integer> relation = (List<Integer>) mp.get("relation");
     PlanEntity plan = new PlanEntity();
     plan.setId(relation.get(0));
     PlanEntity prePlan = new PlanEntity();
     prePlan.setId(relation.get(1));
     relationR.deleteAllByPlanByPlanIdAndPlanByPrePlanId(plan, prePlan);
+
+    // 2 结束处理 比对 悬空的 顺序限制计划 -> 改成无限制 计划
+
+    dealOPlan2NoPlan(oldOplans, date);
+
   }
 
-  public Map<String, Set<String>> deletePlan(PlanEntity plan) {
+  public void dealOPlan2NoPlan(List<PlanEntity> oldOplans, String date) {
+
+    Set<Integer> checkSet = new HashSet<>();
+
+    List<PlanEntity> newOplans = (List<PlanEntity>) dealWithGetAllLimitedPlan(date).get("orderLimitedPlanSet");
+
+    // 2.1 现在有的 顺序限制计划
+    for (PlanEntity p : newOplans) {
+      checkSet.add(p.getId());
+    }
+
+    // 2.3 比对出 悬空的 顺序限制计划 改成 无限制计划
+    for (PlanEntity p : oldOplans) {
+      if (!checkSet.contains(p.getId())) {
+        p.setX(null);
+        p.setY(null);
+        planR.save(p);
+      }
+    }
+  }
+
+  public void deleteWeekMonthPlan(Map<String, Object> mp) {
+    planR.deleteById((Integer) mp.get("id"));
+  }
+
+  public Map<String, Set<String>> deleteDayPlan(Integer id, String date) {
+
+    PlanEntity plan = planR.findOneById(id);
+    logger.info("传入计划 id " + id);
+
+    // 2.2 查询原来有的 顺序限制 计划
+    List<PlanEntity> oldOplans = (List<PlanEntity>) dealWithGetAllLimitedPlan(date).get("orderLimitedPlanSet");
+    for (PlanEntity p : oldOplans) {
+      logger.info("旧计划 id " + p.getId());
+    }
+
+    // 1 开始处理
 
     Map<String, Set<String>> mp = new HashMap<>();
 
     Set<String> rs = new HashSet<>();
     Set<String> oPlans = new HashSet<>();
 
+    // 1.1 查询需要删掉的 relation
     List<RelationEntity> delRelations = relationR.findAllByPlanByPlanIdOrPlanByPrePlanId(plan, plan);
 
     for (RelationEntity relation : delRelations) {
       PlanEntity backPlan = relation.getPlanByPlanId();
       PlanEntity prePlan = relation.getPlanByPrePlanId();
 
+      logger.info(backPlan.getId().toString());
+      logger.info(prePlan.getId().toString());
+
       String backPlan_str = null;
       String prePlan_str = null;
 
-      if (getPlanType(backPlan) == 1) {
+      // 1.2 如果 relation 前后结点 是 顺序限制计划 -> 添加到 oPlans
+      if (getPlanType(backPlan) == 21) {
+        logger.info("backPlan 是 顺序限制");
         backPlan_str = "o" + String.valueOf(backPlan.getId());
         if (backPlan.getId() != plan.getId())
           oPlans.add(backPlan_str);
+      } else if (getPlanType(backPlan) == 11) {
+        logger.info("backPlan 是 时间限制");
+        backPlan_str = "t" + String.valueOf(backPlan.getId());
       }
-      if (getPlanType(prePlan) == 1) {
+      if (getPlanType(prePlan) == 21) {
+        logger.info("prePlan 是 顺序限制");
         prePlan_str = "o" + String.valueOf(prePlan.getId());
         if (prePlan.getId() != plan.getId())
           oPlans.add(prePlan_str);
+      } else if (getPlanType(prePlan) == 11) {
+        logger.info("prePlan 是 时间限制");
+        prePlan_str = "t" + String.valueOf(prePlan.getId());
       }
+      // 1.3 拼接出 删除掉的 relation
       rs.add("r" + prePlan_str + "-" + backPlan_str);
 
     }
 
+    // 1.4 放入 mp
     mp.put("relations", rs);
     mp.put("plans", oPlans);
 
@@ -466,6 +595,12 @@ public class PlanService {
     ufPlanR.deleteAll(ufPlans);
     planR.delete(plan);
 
+    // 2 结束处理 比对 悬空的 顺序限制计划 -> 改成无限制 计划
+
+    oldOplans.remove(plan);
+
+    dealOPlan2NoPlan(oldOplans, date);
+
     return mp;
 
   }
@@ -474,6 +609,10 @@ public class PlanService {
     PlanEntity plan = planR.findOneById((Integer) mp.get("id"));
     plan.setX((Integer) mp.get("x"));
     plan.setY((Integer) mp.get("y"));
+    planR.save(plan);
+  }
+
+  public void updatePlan(PlanEntity plan) {
     planR.save(plan);
   }
 

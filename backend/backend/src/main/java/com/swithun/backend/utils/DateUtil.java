@@ -66,9 +66,14 @@ public class DateUtil {
         return strs;
     }
 
-    public static String TimeStamp2LocalDateStr(String timeStampStr) {
+    public static LocalDate TimeStamp2LocalDate(String timeStampStr) {
         long timestamp = Long.valueOf(timeStampStr);
         LocalDate localDate = Instant.ofEpochMilli(timestamp).atZone(ZoneOffset.ofHours(8)).toLocalDate();
+        return localDate;
+    }
+
+    public static String TimeStamp2LocalDateStr(String timeStampStr) {
+        LocalDate localDate = TimeStamp2LocalDate(timeStampStr);
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String dateStr =localDate.format(fmt);
         System.out.println("DateUtil: " + dateStr);

@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-20 14:09:15
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-26 10:12:27
+ * @LastEditTime: 2021-05-11 16:19:27
  */
 package com.swithun.backend.entity;
 
@@ -42,6 +42,8 @@ public class PlanTypeEntity {
     private Collection<TimeLimitEntity> timeLimitsById;
     @JsonIgnore
     private Collection<FrequencyLimitEntity> frequencyLimitsById;
+    @JsonIgnore
+    private Collection<RewardSettingEntity> rewardSettingsById;
 
     @Id
     @Column(name = "id")
@@ -142,5 +144,14 @@ public class PlanTypeEntity {
 
     public void setFrequencyLimitsById(Collection<FrequencyLimitEntity> frequencyLimitsById) {
         this.frequencyLimitsById = frequencyLimitsById;
+    }
+
+    @OneToMany(mappedBy = "planTypeByTaskType")
+    public Collection<RewardSettingEntity> getRewardSettingsById() {
+        return rewardSettingsById;
+    }
+
+    public void setRewardSettingsById(Collection<RewardSettingEntity> rewardSettingsById) {
+        this.rewardSettingsById = rewardSettingsById;
     }
 }

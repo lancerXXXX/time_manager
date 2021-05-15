@@ -5,11 +5,15 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-26 10:09:19
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-26 10:09:43
+ * @LastEditTime: 2021-05-11 16:57:21
  */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -39,6 +43,8 @@ public class FrequencyLimitEntity {
     private Integer max;
     private Integer time;
     private PlanTypeEntity planTypeByPlanTypeId;
+    @JsonIgnore
+    private Collection<RewardRecordEntity> rewardRecordsById;
 
     @Id
     @Column(name = "id")
@@ -86,12 +92,12 @@ public class FrequencyLimitEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FrequencyLimitEntity that = (FrequencyLimitEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(min, that.min) && Objects.equals(max, that.max) && Objects.equals(time, that.time);
+        return Objects.equals(id, that.id) && Objects.equals(max, that.max) && Objects.equals(min, that.min) && Objects.equals(time, that.time);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, min, max, time);
+        return Objects.hash(id, max, min, time);
     }
 
     @ManyToOne
@@ -102,5 +108,14 @@ public class FrequencyLimitEntity {
 
     public void setPlanTypeByPlanTypeId(PlanTypeEntity planTypeByPlanTypeId) {
         this.planTypeByPlanTypeId = planTypeByPlanTypeId;
+    }
+
+    @OneToMany(mappedBy = "frequencyLimitByFLimitId")
+    public Collection<RewardRecordEntity> getRewardRecordsById() {
+        return rewardRecordsById;
+    }
+
+    public void setRewardRecordsById(Collection<RewardRecordEntity> rewardRecordsById) {
+        this.rewardRecordsById = rewardRecordsById;
     }
 }
