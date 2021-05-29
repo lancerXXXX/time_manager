@@ -12,6 +12,10 @@ public class StTimeEntity {
     private Integer id;
     private Boolean notDate;
     private Boolean notTime;
+    // 0 : 具体日期
+    // 1 : 每天
+    // 2 : 每周
+    private Integer repeatType;
     private String startDate;
     private String endDate;
     private String startTime;
@@ -25,6 +29,17 @@ public class StTimeEntity {
     public Integer getId() {
         return id;
     }
+
+    @Basic
+    @Column(name ="repeat_type")
+    public Integer getRepeatType() {
+        return repeatType;
+    }
+
+    public void setRepeatType(Integer repeatType) {
+        this.repeatType = repeatType;
+    }
+
 
     public void setId(Integer id) {
         this.id = id;

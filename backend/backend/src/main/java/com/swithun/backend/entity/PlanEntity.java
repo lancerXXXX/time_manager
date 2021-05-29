@@ -14,6 +14,62 @@ import java.util.Objects;
 @Table(name = "plan", schema = "time_manger", catalog = "")
 public class PlanEntity {
 
+    private Integer id;
+    private String planName;
+    private Integer repeatType;
+    // 0 不重复 ymd
+    // 1 周重复 1-7
+    // 2 月重复 d
+    // 3 年重复 md
+    private String expectedStartDate;
+    private String expectedEndDate;
+    private String expectedStartTimeBegin;
+    private String expectedStartTimeEnd;
+    private String expectedEndTimeBegin;
+    private String expectedEndTimeEnd;
+    private String practiceStartDateTime;
+    private String practiceEndDateTime;
+    private Integer x;
+    private Integer y;
+    private Integer devotion;
+    private Integer satisfaction;
+    private Integer priority;
+    private Integer expectedTime;
+    private Integer time;
+    private String note;
+    private ArrayList<Integer> typeList;
+    @JsonIgnore
+    private Collection<FinishedTaskRecordEntity> finishedTaskRecordsById;
+
+    @JsonIgnore
+    private Collection<TaskTemplateEntity> taskTemplatesById;
+    @JsonIgnore
+    private Collection<UnfinishedPlanEntity> unfinishedPlansById;
+    @JsonIgnore
+    private Collection<FinishedPlanEntity> finishedPlansById;
+    @JsonProperty("taskType")
+    private PlanTypeEntity planTypeByPlanType;
+    @JsonProperty("subTasks")
+    private Collection<SubTaskEntity> subTasksById;
+    // @JsonIgnore
+    private Collection<TrackEntity> tracksById;
+
+    @JsonIgnore
+    private Collection<RelationEntity> relationsById;// 当前plan
+    @JsonIgnore
+    private Collection<RelationEntity> relationsById_0; // plan前驱
+
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     @Transient
     public List<Integer> getTypeList() {
         return typeList;
@@ -44,56 +100,6 @@ public class PlanEntity {
         this.id = id;
     }
 
-    private Integer id;
-    private String planName;
-    private Integer repeatType;
-    // 0 不重复 ymd
-    // 1 周重复 1-7
-    // 2 月重复 d
-    // 3 年重复 md
-    private String expectedStartDate;
-    private String expectedEndDate;
-    private String expectedStartTimeBegin;
-    private String expectedStartTimeEnd;
-    private String expectedEndTimeBegin;
-    private String expectedEndTimeEnd;
-    private String practiceStartDateTime;
-    private String practiceEndDateTime;
-    private Integer x;
-    private Integer y;
-    private Integer devotion;
-    private Integer satisfaction;
-    private Integer priority;
-    private Integer expectedTime;
-    private Integer time;
-    private String note;
-    private ArrayList<Integer> typeList;
-    @JsonIgnore
-    private Collection<FinishedTaskRecordEntity> finishedTaskRecordsById;
-    @JsonIgnore
-    private Collection<UnfinishedPlanEntity> unfinishedPlansById;
-    @JsonIgnore
-    private Collection<FinishedPlanEntity> finishedPlansById;
-    @JsonProperty("taskType")
-    private PlanTypeEntity planTypeByPlanType;
-    // @JsonIgnore
-    @JsonProperty("subTasks")
-    private Collection<SubTaskEntity> subTasksById;
-    @JsonIgnore
-    private Collection<TrackEntity> tracksById;
-
-    @JsonIgnore
-    private Collection<RelationEntity> relationsById;// 当前plan
-    @JsonIgnore
-    private Collection<RelationEntity> relationsById_0; // plan前驱
-
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Integer getId() {
-        return id;
-    }
-
     @Basic
     @Column(name = "expected_time")
     public Integer getExpectedTime() {
@@ -103,7 +109,6 @@ public class PlanEntity {
     public void setExpectedTime(Integer expectedTime) {
         this.expectedTime = expectedTime;
     }
-
 
     @Basic
     @Column(name = "expected_start_time_begin")
@@ -163,10 +168,6 @@ public class PlanEntity {
 
     public void setY(Integer y) {
         this.y = y;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     @Basic
@@ -310,6 +311,7 @@ public class PlanEntity {
         this.unfinishedPlansById = unfinishedPlansById;
     }
 
+    // 已完成计划
     @OneToMany(mappedBy = "planByPlanId", cascade = CascadeType.ALL)
     public Collection<FinishedPlanEntity> getFinishedPlansById() {
         return finishedPlansById;
@@ -318,6 +320,17 @@ public class PlanEntity {
     public void setFinishedPlansById(Collection<FinishedPlanEntity> finishedPlansById) {
         this.finishedPlansById = finishedPlansById;
     }
+
+    // 任务模板
+    @OneToMany(mappedBy = "planByPlanId", cascade = CascadeType.ALL)
+    public Collection<TaskTemplateEntity> getTaskTemplatesById() {
+        return taskTemplatesById;
+    }
+
+    public void setTaskTemplatesById(Collection<TaskTemplateEntity> taskTemplatesById) {
+        this.taskTemplatesById = taskTemplatesById;
+    }
+    //
 
     @ManyToOne
     @JoinColumn(name = "plan_type", referencedColumnName = "id")
@@ -364,4 +377,5 @@ public class PlanEntity {
     public void setRelationsById_0(Collection<RelationEntity> relationsById_0) {
         this.relationsById_0 = relationsById_0;
     }
+
 }

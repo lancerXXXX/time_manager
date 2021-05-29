@@ -5,10 +5,11 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 15:52:48
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-06 10:20:57
+ * @LastEditTime: 2021-05-29 20:20:46
  */
 package com.swithun.backend.utils;
 
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -78,5 +79,10 @@ public class DateUtil {
         String dateStr =localDate.format(fmt);
         System.out.println("DateUtil: " + dateStr);
         return dateStr;
+    }
+
+    public static Integer getDayOfWeek(LocalDate localDate) {
+        DayOfWeek dayOfWeek = DayOfWeek.from(localDate);
+        return dayOfWeek.getValue();
     }
 }

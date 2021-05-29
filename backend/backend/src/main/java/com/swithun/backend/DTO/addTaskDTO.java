@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-28 19:46:12
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-04-28 19:56:15
+ * @LastEditTime: 2021-05-28 10:29:58
  */
 package com.swithun.backend.DTO;
 
@@ -15,6 +15,12 @@ import com.swithun.backend.entity.SubTaskEntity;
 import com.swithun.backend.entity.TrackEntity;
 
 public class addTaskDTO {
+    public Integer getExpectedTime() {
+        return expectedTime;
+    }
+    public void setExpectedTime(Integer expectedTime) {
+        this.expectedTime = expectedTime;
+    }
     public addTaskDTO() {
     }
     public String getName() {
@@ -85,6 +91,7 @@ public class addTaskDTO {
     private String note;
     private Integer devotion;
     private Integer satisfaction;
+    private Integer expectedTime;
     private List<SubTaskEntity> subTasks;
     private List<TrackEntity> tracks;
 }

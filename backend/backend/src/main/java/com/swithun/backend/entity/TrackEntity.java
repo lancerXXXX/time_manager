@@ -1,6 +1,18 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @@Company: None
+ * @Author: Swithun Liu
+ * @Date: 2021-04-28 20:49:34
+ * @LastEditors: Swithun Liu
+ * @LastEditTime: 2021-05-28 10:33:30
+ */
 package com.swithun.backend.entity;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Objects;
 
 @Entity
@@ -10,6 +22,7 @@ public class TrackEntity {
     private String name;
     private String startTime;
     private String endTime;
+    @JsonIgnore
     private PlanEntity planByParentPlan;
 
     @Id

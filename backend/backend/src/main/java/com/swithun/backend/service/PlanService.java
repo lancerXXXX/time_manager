@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-12 16:42:46
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-14 10:44:37
+ * @LastEditTime: 2021-05-28 10:30:30
  */
 package com.swithun.backend.service;
 
@@ -418,17 +418,22 @@ public class PlanService {
     plan.setTime(dto.getTime());
     plan.setNote(dto.getNote());
     plan.setPlanTypeByPlanType(new PlanTypeEntity(dto.getType()));
-    PlanEntity rtPlan = planR.save(plan);
+    plan.setExpectedTime(dto.getExpectedTime());
     List<SubTaskEntity> subTasks = dto.getSubTasks();
     for (SubTaskEntity task : subTasks) {
-      task.setPlanByParentPlan(rtPlan);
+      task.setPlanByParentPlan(plan);
     }
-    subTaskR.saveAll(subTasks);
+    plan.setSubTasksById(subTasks);
+    // subTaskR.saveAll(subTasks);
     List<TrackEntity> tracks = dto.getTracks();
     for (TrackEntity track : tracks) {
-      track.setPlanByParentPlan(rtPlan);
+      track.setPlanByParentPlan(plan);
     }
-    trackR.saveAll(tracks);
+    plan.setTracksById(tracks);
+
+    PlanEntity rtPlan = planR.save(plan);
+    logger.info("新计划 id " + rtPlan.getId());
+    // trackR.saveAll(tracks);
     FinishedTaskRecordEntity finishedTaskRecord = new FinishedTaskRecordEntity();
     finishedTaskRecord.setStartTime(dto.getStartTime());
     finishedTaskRecord.setEndTime(dto.getEndTime());

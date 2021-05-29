@@ -20,7 +20,6 @@ import org.springframework.stereotype.Repository;
 public interface PlanTypeRepository extends JpaRepository<PlanTypeEntity, Integer>{
     public List<PlanTypeEntity> findAll();
     public List<PlanTypeEntity> findAllByPlanTypeByParentId(PlanTypeEntity planTypeEntity);
-    // public void update(PlanTypeEntity planTypeEntity);
     public void deleteById(Integer id);
     public PlanTypeEntity findOneByName(String name);
 }

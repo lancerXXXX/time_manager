@@ -1,0 +1,126 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGBUS (0x7) at pc=0x00007f519c72e2d5, pid=2087, tid=7840
+#
+# JRE version: OpenJDK Runtime Environment (11.0.10+9) (build 11.0.10+9-Ubuntu-0ubuntu1.20.04)
+# Java VM: OpenJDK 64-Bit Server VM (11.0.10+9-Ubuntu-0ubuntu1.20.04, mixed mode, sharing, tiered, compressed oops, g1 gc, linux-amd64)
+# Problematic frame:
+# 
+[error occurred during error reporting (printing problematic frame), id 0x7, SIGBUS (0x7) at pc=0x00007f519ce65555]
+
+# No core dump will be written. 
+#
+# If you would like to submit a bug report, please visit:
+#   https://bugs.launchpad.net/ubuntu/+source/openjdk-lts
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -Xverify:none -XX:TieredStopAtLevel=1 com.swithun.backend.BackendApplication
+
+Host: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz, 5 cores, 5G, Ubuntu 20.04.2 LTS
+Time: Thu May 27 19:59:57 2021 CST elapsed time: 11335.655271 seconds (0d 3h 8m 55s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x00007f512cf1b800):  JavaThread "http-nio-8088-exec-9" daemon [_thread_in_vm, id=7840, stack(0x00007f514c5e5000,0x00007f514c6e6000)]
+
+Stack: [0x00007f514c5e5000,0x00007f514c6e6000],  sp=0x00007f514c6dc420,  free space=989k
+Native frames: (J=compiled Java code, A=aot compiled Java code, j=interpreted, Vv=VM code, C=native code)
+
+[error occurred during error reporting (printing native stack), id 0x7, SIGBUS (0x7) at pc=0x00007f519ce65555]
+
+Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+v  ~RuntimeStub::monitorenter_nofpu Runtime1 stub
+J 8400 c1 jdk.internal.loader.BuiltinClassLoader.loadClassOrNull(Ljava/lang/String;Z)Ljava/lang/Class; java.base@11.0.10 (143 bytes) @ 0x00007f517dcbb243 [0x00007f517dcbaba0+0x00000000000006a3]
+J 579 c1 jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(Ljava/lang/String;Z)Ljava/lang/Class; java.base@11.0.10 (40 bytes) @ 0x00007f517d00b16c [0x00007f517d00b000+0x000000000000016c]
+J 575 c1 java.lang.ClassLoader.loadClass(Ljava/lang/String;)Ljava/lang/Class; java.base@11.0.10 (7 bytes) @ 0x00007f517d009ba4 [0x00007f517d009b40+0x0000000000000064]
+v  ~StubRoutines::call_stub
+v  ~RuntimeStub::load_mirror_patching Runtime1 stub
+J 7864 c1 com.mysql.cj.NativeSession.checkClosed()V (63 bytes) @ 0x00007f517dbcf6e1 [0x00007f517dbcf400+0x00000000000002e1]
+J 10695 c1 com.mysql.cj.jdbc.ConnectionImpl.setNetworkTimeout(Ljava/util/concurrent/Executor;I)V (90 bytes) @ 0x00007f517e0501b4 [0x00007f517e04ffc0+0x00000000000001f4]
+J 11083 c1 com.zaxxer.hikari.pool.PoolBase.setNetworkTimeout(Ljava/sql/Connection;J)V (21 bytes) @ 0x00007f517e0ef9b4 [0x00007f517e0ef940+0x0000000000000074]
+j  com.zaxxer.hikari.pool.PoolBase.isConnectionAlive(Ljava/sql/Connection;)Z+47
+J 16367 c1 com.zaxxer.hikari.pool.HikariPool.getConnection(J)Ljava/sql/Connection; (229 bytes) @ 0x00007f517ea9813c [0x00007f517ea97fc0+0x000000000000017c]
+J 16366 c1 com.zaxxer.hikari.HikariDataSource.getConnection()Ljava/sql/Connection; (167 bytes) @ 0x00007f517ea9a15c [0x00007f517ea99bc0+0x000000000000059c]
+j  org.hibernate.engine.jdbc.connections.internal.DatasourceConnectionProviderImpl.getConnection()Ljava/sql/Connection;+48
+j  org.hibernate.internal.NonContextualJdbcConnectionAccess.obtainConnection()Ljava/sql/Connection;+13
+J 9347 c1 org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquireConnectionIfNeeded()Ljava/sql/Connection; (69 bytes) @ 0x00007f517de25974 [0x00007f517de25900+0x0000000000000074]
+J 9346 c1 org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.getPhysicalConnection()Ljava/sql/Connection; (9 bytes) @ 0x00007f517de255ac [0x00007f517de25540+0x000000000000006c]
+J 15858 c1 org.hibernate.internal.SessionImpl.connection()Ljava/sql/Connection; (19 bytes) @ 0x00007f517e9afe84 [0x00007f517e9afde0+0x00000000000000a4]
+j  org.springframework.orm.jpa.vendor.HibernateJpaDialect.beginTransaction(Ljavax/persistence/EntityManager;Lorg/springframework/transaction/TransactionDefinition;)Ljava/lang/Object;+106
+j  org.springframework.orm.jpa.JpaTransactionManager.doBegin(Ljava/lang/Object;Lorg/springframework/transaction/TransactionDefinition;)V+151
+j  org.springframework.transaction.support.AbstractPlatformTransactionManager.startTransaction(Lorg/springframework/transaction/TransactionDefinition;Ljava/lang/Object;ZLorg/springframework/transaction/support/AbstractPlatformTransactionManager$SuspendedResourcesHolder;)Lorg/springframework/transaction/TransactionStatus;+32
+j  org.springframework.transaction.support.AbstractPlatformTransactionManager.getTransaction(Lorg/springframework/transaction/TransactionDefinition;)Lorg/springframework/transaction/TransactionStatus;+182
+J 16339 c1 org.springframework.transaction.interceptor.TransactionAspectSupport.createTransactionIfNecessary(Lorg/springframework/transaction/PlatformTransactionManager;Lorg/springframework/transaction/interceptor/TransactionAttribute;Ljava/lang/String;)Lorg/springframework/transaction/interceptor/TransactionAspectSupport$TransactionInfo; (102 bytes) @ 0x00007f517ea8a4ac [0x00007f517ea8a000+0x00000000000004ac]
+j  org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(Ljava/lang/reflect/Method;Ljava/lang/Class;Lorg/springframework/transaction/interceptor/TransactionAspectSupport$InvocationCallback;)Ljava/lang/Object;+285
+J 16356 c1 org.springframework.transaction.interceptor.TransactionInterceptor.invoke(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object; (44 bytes) @ 0x00007f517ea94cf4 [0x00007f517ea94ae0+0x0000000000000214]
+J 9930 c1 org.springframework.aop.framework.ReflectiveMethodInvocation.proceed()Ljava/lang/Object; (126 bytes) @ 0x00007f517df1e6dc [0x00007f517df1e4a0+0x000000000000023c]
+j  org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object;+1
+J 9930 c1 org.springframework.aop.framework.ReflectiveMethodInvocation.proceed()Ljava/lang/Object; (126 bytes) @ 0x00007f517df1e6dc [0x00007f517df1e4a0+0x000000000000023c]
+J 16404 c1 org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object; (183 bytes) @ 0x00007f517eaa9a1c [0x00007f517eaa9520+0x00000000000004fc]
+J 9930 c1 org.springframework.aop.framework.ReflectiveMethodInvocation.proceed()Ljava/lang/Object; (126 bytes) @ 0x00007f517df1e6dc [0x00007f517df1e4a0+0x000000000000023c]
+j  org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object;+18
+J 9930 c1 org.springframework.aop.framework.ReflectiveMethodInvocation.proceed()Ljava/lang/Object; (126 bytes) @ 0x00007f517df1e6dc [0x00007f517df1e4a0+0x000000000000023c]
+J 10075 c1 org.springframework.aop.framework.JdkDynamicAopProxy.invoke(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object; (575 bytes) @ 0x00007f517df4ea44 [0x00007f517df4e6a0+0x00000000000003a4]
+j  com.sun.proxy.$Proxy510.findAll()Ljava/util/List;+9
+j  com.swithun.backend.service.LimitService.getAllFrequencyLimit()Ljava/util/List;+4
+j  com.swithun.backend.controller.LimitController.getAllFrequncyLimit()Ljava/util/List;+4
+v  ~StubRoutines::call_stub
+J 2419  jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object; java.base@11.0.10 (0 bytes) @ 0x00007f517d2c3a47 [0x00007f517d2c39c0+0x0000000000000087]
+J 2418 c1 jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object; java.base@11.0.10 (104 bytes) @ 0x00007f517d2c49dc [0x00007f517d2c4620+0x00000000000003bc]
+J 2124 c1 jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object; java.base@11.0.10 (10 bytes) @ 0x00007f517d245ba4 [0x00007f517d245b40+0x0000000000000064]
+J 15882 c1 org.springframework.web.method.support.InvocableHandlerMethod.doInvoke([Ljava/lang/Object;)Ljava/lang/Object; (147 bytes) @ 0x00007f517e9bb79c [0x00007f517e9bb620+0x000000000000017c]
+j  org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(Lorg/springframework/web/context/request/NativeWebRequest;Lorg/springframework/web/method/support/ModelAndViewContainer;[Ljava/lang/Object;)Ljava/lang/Object;+54
+j  org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(Lorg/springframework/web/context/request/ServletWebRequest;Lorg/springframework/web/method/support/ModelAndViewContainer;[Ljava/lang/Object;)V+4
+j  org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Lorg/springframework/web/method/HandlerMethod;)Lorg/springframework/web/servlet/ModelAndView;+244
+J 15909 c1 org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Lorg/springframework/web/method/HandlerMethod;)Lorg/springframework/web/servlet/ModelAndView; (128 bytes) @ 0x00007f517e9c86cc [0x00007f517e9c8400+0x00000000000002cc]
+j  org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Ljava/lang/Object;)Lorg/springframework/web/servlet/ModelAndView;+7
+j  org.springframework.web.servlet.DispatcherServlet.doDispatch(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V+257
+J 15881 c1 org.springframework.web.servlet.DispatcherServlet.doService(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V (305 bytes) @ 0x00007f517e9ba26c [0x00007f517e9b98a0+0x00000000000009cc]
+j  org.springframework.web.servlet.FrameworkServlet.processRequest(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V+71
+j  org.springframework.web.servlet.FrameworkServlet.doGet(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V+3
+J 15852 c1 javax.servlet.http.HttpServlet.service(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V (269 bytes) @ 0x00007f517e9aecb4 [0x00007f517e9ae620+0x0000000000000694]
+j  org.springframework.web.servlet.FrameworkServlet.service(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V+33
+J 15895 c1 javax.servlet.http.HttpServlet.service(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V (40 bytes) @ 0x00007f517e9c1d8c [0x00007f517e9c1c80+0x000000000000010c]
+J 9873 c1 org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V (388 bytes) @ 0x00007f517df055d4 [0x00007f517df05380+0x0000000000000254]
+J 9872 c1 org.apache.catalina.core.ApplicationFilterChain.doFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V (103 bytes) @ 0x00007f517df04f94 [0x00007f517df04f40+0x0000000000000054]
+j  org.apache.tomcat.websocket.server.WsFilter.doFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V+21
+J 9873 c1 org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V (388 bytes) @ 0x00007f517df05824 [0x00007f517df05380+0x00000000000004a4]
+J 9872 c1 org.apache.catalina.core.ApplicationFilterChain.doFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V (103 bytes) @ 0x00007f517df04f94 [0x00007f517df04f40+0x0000000000000054]
+j  org.springframework.web.filter.RequestContextFilter.doFilterInternal(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Ljavax/servlet/FilterChain;)V+21
+J 10163 c1 org.springframework.web.filter.OncePerRequestFilter.doFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V (175 bytes) @ 0x00007f517df7aeec [0x00007f517df7ab20+0x00000000000003cc]
+J 9873 c1 org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V (388 bytes) @ 0x00007f517df05824 [0x00007f517df05380+0x00000000000004a4]
+J 9872 c1 org.apache.catalina.core.ApplicationFilterChain.doFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V (103 bytes) @ 0x00007f517df04f94 [0x00007f517df04f40+0x0000000000000054]
+j  org.springframework.web.filter.FormContentFilter.doFilterInternal(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Ljavax/servlet/FilterChain;)V+38
+J 10163 c1 org.springframework.web.filter.OncePerRequestFilter.doFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V (175 bytes) @ 0x00007f517df7aeec [0x00007f517df7ab20+0x00000000000003cc]
+J 9873 c1 org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V (388 bytes) @ 0x00007f517df05824 [0x00007f517df05380+0x00000000000004a4]
+J 9872 c1 org.apache.catalina.core.ApplicationFilterChain.doFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V (103 bytes) @ 0x00007f517df04f94 [0x00007f517df04f40+0x0000000000000054]
+j  org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Ljavax/servlet/FilterChain;)V+53
+J 10163 c1 org.springframework.web.filter.OncePerRequestFilter.doFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V (175 bytes) @ 0x00007f517df7aeec [0x00007f517df7ab20+0x00000000000003cc]
+J 9873 c1 org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V (388 bytes) @ 0x00007f517df05824 [0x00007f517df05380+0x00000000000004a4]
+J 9872 c1 org.apache.catalina.core.ApplicationFilterChain.doFilter(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V (103 bytes) @ 0x00007f517df04f94 [0x00007f517df04f40+0x0000000000000054]
+j  org.apache.catalina.core.StandardWrapperValve.invoke(Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;)V+694
+j  org.apache.catalina.core.StandardContextValve.invoke(Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;)V+169
+j  org.apache.catalina.authenticator.AuthenticatorBase.invoke(Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;)V+260
+j  org.apache.catalina.core.StandardHostValve.invoke(Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;)V+128
+j  org.apache.catalina.valves.ErrorReportValve.invoke(Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;)V+6
+j  org.apache.catalina.core.StandardEngineValve.invoke(Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;)V+59
+j  org.apache.catalina.connector.CoyoteAdapter.service(Lorg/apache/coyote/Request;Lorg/apache/coyote/Response;)V+199
+j  org.apache.coyote.http11.Http11Processor.service(Lorg/apache/tomcat/util/net/SocketWrapperBase;)Lorg/apache/tomcat/util/net/AbstractEndpoint$Handler$SocketState;+737
+j  org.apache.coyote.AbstractProcessorLight.process(Lorg/apache/tomcat/util/net/SocketWrapperBase;Lorg/apache/tomcat/util/net/SocketEvent;)Lorg/apache/tomcat/util/net/AbstractEndpoint$Handler$SocketState;+170
+J 16421 c1 org.apache.coyote.AbstractProtocol$ConnectionHandler.process(Lorg/apache/tomcat/util/net/SocketWrapperBase;Lorg/apache/tomcat/util/net/SocketEvent;)Lorg/apache/tomcat/util/net/AbstractEndpoint$Handler$SocketState; (1315 bytes) @ 0x00007f517eab895c [0x00007f517eab7560+0x00000000000013fc]
+J 16420 c1 org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun()V (637 bytes) @ 0x00007f517eab2e3c [0x00007f517eab2aa0+0x000000000000039c]
+J 16418 c1 org.apache.tomcat.util.net.SocketProcessorBase.run()V (35 bytes) @ 0x00007f517eab202c [0x00007f517eab1e60+0x00000000000001cc]
+J 13582 c1 java.util.concurrent.ThreadPoolExecutor.runWorker(Ljava/util/concurrent/ThreadPoolExecutor$Worker;)V java.base@11.0.10 (187 bytes) @ 0x00007f517e565fd4 [0x00007f517e565ce0+0x00000000000002f4]
+J 15761 c1 java.util.concurrent.ThreadPoolExecutor$Worker.run()V java.base@11.0.10 (9 bytes) @ 0x00007f517e988024 [0x00007f517e987fc0+0x0000000000000064]
+j  org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run()V+4
+J 14961 c1 java.lang.Thread.run()V java.base@11.0.10 (17 bytes) @ 0x00007f517e816fac [0x00007f517e816f40+0x000000000000006c]
+v  ~StubRoutines::call_stub
+
+siginfo: si_signo: 7 (SIGBUS), si_code: 2 (BUS_ADRERR), si_addr: 0x00007f50f00c0090
+
+Register to memory mapping:
+
+RAX=
