@@ -5,10 +5,11 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-29 15:43:09
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-29 21:10:06
+ * @LastEditTime: 2021-05-30 10:49:13
  */
 package com.swithun.backend.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,6 +23,11 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import com.swithun.backend.dao.FinishedTaskRecordRepository;
+import com.swithun.backend.dao.StDevotionRepository;
+import com.swithun.backend.dao.StNameRepository;
+import com.swithun.backend.dao.StSatisfactionRepository;
+import com.swithun.backend.dao.StTimeRepository;
+import com.swithun.backend.dao.StTypeRepository;
 import com.swithun.backend.dao.StatisticTemplateRepository;
 import com.swithun.backend.entity.FinishedTaskRecordEntity;
 import com.swithun.backend.entity.StDevotionEntity;
@@ -47,13 +53,59 @@ public class StatisticService {
     @Autowired
     private FinishedTaskRecordRepository fTaskRecordR;
 
-    Logger logger = LoggerFactory.getLogger(StatisticService.class);
+    @Autowired
+    private StDevotionRepository devotionR;
+    @Autowired
+    private StNameRepository nameR;
+    @Autowired
+    private StSatisfactionRepository satisfactionR;
+    @Autowired
+    private StTimeRepository timeR;
+    @Autowired
+    private StTypeRepository typeR;
+
 
     @Autowired
     private ClassConvert convert;
 
+    Logger logger = LoggerFactory.getLogger(StatisticService.class);
+
     public StatisticTemplateEntity addStatisticTemplate(StatisticTemplateEntity st) {
+
+        logger.info("id是 " + st.getId());
+
+        if (st.getId() != null) {
+            logger.info("id不是null" + st.getId());
+            StatisticTemplateEntity origin_st = stR.findById(st.getId()).get();
+            if (origin_st != null) {
+
+                Collection<StDevotionEntity> devotions = new ArrayList<StDevotionEntity>(origin_st.getStDevotionsById());
+                origin_st.getStDevotionsById().removeAll(devotions);
+                devotionR.deleteAll(devotions);
+
+                Collection<StNameEntity> names = new ArrayList<StNameEntity>(origin_st.getStNamesById());
+                origin_st.getStNamesById().removeAll(names);
+                nameR.deleteAll(names);
+
+                Collection<StSatisfactionEntity> satisfactions = new ArrayList<StSatisfactionEntity>(origin_st.getStSatisfactionsById());
+                origin_st.getStSatisfactionsById().removeAll(satisfactions);
+                satisfactionR.deleteAll(satisfactions);
+
+                Collection<StTimeEntity> times = new ArrayList<StTimeEntity>(origin_st.getStTimesById());
+                origin_st.getStTimesById().removeAll(times);
+                timeR.deleteAll(times);
+
+                Collection<StTypeEntity> types = new ArrayList<StTypeEntity>(origin_st.getStTypesById());
+                origin_st.getStTypesById().removeAll(types);
+                typeR.deleteAll(types);
+
+                stR.save(origin_st);
+
+            }
+        }
+
         Collection<StDevotionEntity> devotions = st.getStDevotionsById();
+        logger.warn("投入度  " + devotions.size());
         for (StDevotionEntity devotion : devotions) {
             devotion.setStatisticTemplateByStId(st);
         }
@@ -74,6 +126,7 @@ public class StatisticService {
             type.setStatisticTemplateByStId(st);
         }
         return stR.save(st);
+        // return null;
     }
 
     public List<StatisticTemplateEntity> getAllTemplate() {
@@ -141,11 +194,15 @@ public class StatisticService {
                 // Path<Object> startTimePath = root.get("startTime");
                 // Path<Object> endTimePath = root.get("endTime");
 
-                Predicate pdcDevotions = null;
-                Predicate pcdNames = null;
-                Predicate pcdTypes = null;
-                Predicate pdcSatisfaction = null;
+                // Predicate pdcDevotions = null;
+                // Predicate pcdNames = null;
+                // Predicate pcdTypes = null;
+                // Predicate pdcSatisfaction = null;
                 // Predicate pdcTimes = null;
+                Predicate pdcDevotions = criteriaBuilder.conjunction();
+                Predicate pcdNames = criteriaBuilder.conjunction();
+                Predicate pcdTypes = criteriaBuilder.conjunction();
+                Predicate pdcSatisfaction = criteriaBuilder.conjunction();
 
                 // 3. 过滤
                 // 3.1 过滤投入度
@@ -196,24 +253,34 @@ public class StatisticService {
                 }
                 // 3.3 过滤计划种类
                 if (types != null) {
+                    if (types.size() > 0) {
+                        pcdTypes = criteriaBuilder.not(pcdTypes);
+                    }
+                    logger.info("过滤计划种类");
                     for (StTypeEntity type : types) {
                         Boolean notType = type.getNotType();
                         Integer typeId = type.getPlanType();
                         logger.warn("notType " + notType);
                         logger.warn("typeId " + typeId);
-                        Predicate newPredication = null;
-                        if (!notType) {
-                            newPredication = criteriaBuilder.equal(typeIdPath.as(Integer.class), typeId);
-                        } else {
-                            newPredication = criteriaBuilder.notEqual(typeIdPath.as(Integer.class), typeId);
+                        Predicate tempTypePredication = criteriaBuilder.conjunction();
+                        tempTypePredication = criteriaBuilder.not(tempTypePredication);
+                        List<Integer> allTypes = convert.getChildrenType(typeId);
+                            logger.error("allTypes长度" + allTypes.size());
+
+                        for (Integer typeIdforCheck: allTypes) {
+                            logger.error(String.valueOf(typeIdforCheck));
+                            tempTypePredication = criteriaBuilder.or(tempTypePredication, criteriaBuilder.equal(typeIdPath.as(Integer.class), typeIdforCheck));
                         }
 
-                        if (pcdTypes == null) {
-                            pcdTypes = newPredication;
-                        } else {
-                            pcdTypes = criteriaBuilder.or(pcdTypes, newPredication);
+                        if (notType) {
+                            tempTypePredication = criteriaBuilder.not(tempTypePredication);
                         }
+
+                        pcdTypes = criteriaBuilder.or(pcdTypes, tempTypePredication);
                     }
+                }
+                else {
+                    logger.info("没有进入过滤计划种类");
                 }
 
                 // 3.4 过滤 满意度
@@ -317,28 +384,51 @@ public class StatisticService {
             logger.info("重复类型为:" + time.getRepeatType());
             if (time.getRepeatType() == 0) {
 
-                if (startTime.compareTo(time.getStartDate()) >= 0 && startTime.compareTo(time.getEndDate()) <= 0
-                        || endTime.compareTo(time.getStartDate()) >= 0 && endTime.compareTo(time.getEndDate()) <= 0) {
+                LocalDate dataStartTime = DateUtil.TimeStamp2LocalDate(startTime);
+                logger.info("dataStartTime " + dataStartTime.toString());
+                LocalDate datadEndTime = DateUtil.TimeStamp2LocalDate(endTime);
+                logger.info("datadEndTime " + datadEndTime.toString());
+                LocalDate stStartDateTime = DateUtil.TimeStamp2LocalDate(time.getStartDate());
+                logger.info("stStartDateTime " + stStartDateTime.toString());
+                LocalDate stEndDateTime = DateUtil.TimeStamp2LocalDate(time.getEndDate());
+                logger.info("stEndDateTime " + stEndDateTime.toString());
+
+
+                if (dataStartTime.compareTo(stStartDateTime) >= 0 && datadEndTime.compareTo(stStartDateTime) <= 0
+                || dataStartTime.compareTo(stEndDateTime) >= 0 && datadEndTime.compareTo(stEndDateTime) <= 0) {
+                    logger.info("符合兄弟");
                     if (time.getNotDate()) {
                         flag = false;
                     }
-                } else {
-                    if (time.getNotDate() == false) {
+                }
+                else {
+                    if (!time.getNotDate()) {
                         flag = false;
                     }
                 }
+
+                // if (startTime.compareTo(time.getStartDate()) >= 0 && startTime.compareTo(time.getEndDate()) <= 0
+                //         || endTime.compareTo(time.getStartDate()) >= 0 && endTime.compareTo(time.getEndDate()) <= 0) {
+                //     if (time.getNotDate()) {
+                //         flag = false;
+                //     }
+                // } else {
+                //     if (time.getNotDate() == false) {
+                //         flag = false;
+                //     }
+                // }
 
             } else if (time.getRepeatType() == 2) {
                 String startDate = time.getStartDate();
                 String[] split = startDate.split(",");
                 List<String> days = Arrays.asList(split);
                 for (String day : days) {
-                    logger.info("有 " + day);
+                    // logger.info("有 " + day);
                 }
                 String startDay = String.valueOf(DateUtil.getDayOfWeek(DateUtil.TimeStamp2LocalDate(startTime)));
                 String endDay = String.valueOf(DateUtil.getDayOfWeek(DateUtil.TimeStamp2LocalDate(endTime)));
 
-                logger.info("哈哈" + startDay + "  " + endDay);
+                // logger.info("哈哈" + startDay + "  " + endDay);
 
                 Boolean tempFlag = false;
                 for (String day : days) {
@@ -360,12 +450,12 @@ public class StatisticService {
                 String[] split = startDate.split(",");
                 List<String> days = Arrays.asList(split);
                 for (String day : days) {
-                    logger.info("有 " + day);
+                    // logger.info("有 " + day);
                 }
                 String startDay = String.valueOf(DateUtil.TimeStamp2LocalDate(startTime).getDayOfMonth() + 1);
                 String endDay = String.valueOf(DateUtil.TimeStamp2LocalDate(endTime).getDayOfMonth() + 1);
 
-                logger.info("哈哈" + startDay + "  " + endDay);
+                // logger.info("哈哈" + startDay + "  " + endDay);
 
                 Boolean tempFlag = false;
                 for (String day : days) {
@@ -387,7 +477,7 @@ public class StatisticService {
                 flagSum = true;
             }
         }
-        logger.info("3.5 过滤时间完毕");
+        // logger.info("3.5 过滤时间完毕");
         return flagSum;
     }
 

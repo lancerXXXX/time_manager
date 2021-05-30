@@ -5,7 +5,7 @@
  * @Author: Swithun Liu
  * @Date: 2021-04-30 15:03:48
  * @LastEditors: Swithun Liu
- * @LastEditTime: 2021-05-29 19:14:14
+ * @LastEditTime: 2021-05-30 10:13:15
  */
 package com.swithun.backend.utils;
 
@@ -200,7 +200,7 @@ public class ClassConvert {
         ArrayList<Integer> res = new ArrayList<>();
 
         while (currentPlanType != null) {
-            res.add(currentPlanType.getId());
+            res.add(0, currentPlanType.getId());
             currentPlanType = currentPlanType.getPlanTypeByParentId();
         }
         return res;
@@ -215,6 +215,19 @@ public class ClassConvert {
         }
         PlanTypeEntity currentPlanType = planTypeR.findById(planTypeId).get();
         return getTypeListByPlanType(currentPlanType);
+    }
+
+    public List<Integer> getChildrenType(Integer typeId) {
+        List<Integer> res = new ArrayList<>();
+        res.add(typeId);
+        PlanTypeEntity planType = planTypeR.findById(typeId).get();
+        Collection<PlanTypeEntity> types = planType.getPlanTypesById();
+            logger.warn("types长度 " + types.size());
+        for (PlanTypeEntity type : types) {
+            logger.warn(type.getName());
+            res.add(type.getId());
+        }
+        return res;
     }
 
 }

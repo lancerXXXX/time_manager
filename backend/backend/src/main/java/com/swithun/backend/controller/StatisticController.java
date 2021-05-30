@@ -57,11 +57,11 @@ public class StatisticController {
         return "删除成功";
     }
 
-    // @PostMapping(value="/statistic/update")
-    // public String updateST(@RequestBody AddStatisticTemplateDTO dto) {
-    //     statisticS.addStatisticTemplate(dto);
-    //     return "更新成功";
-    // }
+    @PostMapping(value="/statistic/update")
+    public String updateST(@RequestBody StatisticTemplateEntity st) {
+        statisticS.addStatisticTemplate(st);
+        return "更新成功";
+    }
     
     @GetMapping(value="/statistic/getDataWithId")
     public List<FinishedTaskRecordEntity> getFilteredDataBySTId(@RequestParam Integer id) {
